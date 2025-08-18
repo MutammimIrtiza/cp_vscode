@@ -1,0 +1,92 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run without LOCAL",
+      "type": "shell",
+      "command": "",
+      "args": [
+        "copy",
+        "\"${file}\"",
+        "${workspaceFolder}\\jspwTest.cpp",
+        "&&",
+        "g++",
+        "jspwTest.cpp",
+        "-o",
+        "jspwTest",
+        "&&",
+        "jspwTest",
+        "<",
+        "input.txt",
+        ">",
+        "output.txt",
+        "&&",
+        "del",
+        "jspwTest.exe",
+        "&&",
+        "del",
+        "jspwTest.cpp"
+      ],
+      "presentation": {
+        "reveal": "never"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run with LOCAL",
+      "type": "shell",
+      "command": "",
+      "args": [
+        "copy",
+        "\"${file}\"",
+        "${workspaceFolder}\\jspwTest.cpp",
+        "&&",
+        "g++",
+        "-DLOCAL",  // <=== This line adds the LOCAL flag
+        "jspwTest.cpp",
+        "-o",
+        "jspwTest",
+        "&&",
+        "jspwTest",
+        "<",
+        "input.txt",
+        ">",
+        "output.txt",
+        "&&",
+        "del",
+        "jspwTest.exe",
+        "&&",
+        "del",
+        "jspwTest.cpp"
+      ],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+            "label": "Build with Sanitizers",
+            "type": "shell",
+            "command": "g++ -std=c++17 -Wshadow -Wall -g -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG \"${file}\" -o \"${fileDirname}/${fileBasenameNoExtension}\"",
+            "options": {
+                "cwd": "/mnt/c/Users/Mutammim/Desktop/cp_vscode"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Run Current Program",
+            "type": "shell",
+            "command": "\"${fileDirname}/${fileBasenameNoExtension}\"",
+            "options": {
+                "cwd": "/mnt/c/Users/Mutammim/Desktop/cp_vscode"
+            }
+        },
+
+  ]
+}

@@ -1,0 +1,16 @@
+install wsl
+
+vim ~/.bashrc
+
+at the end, paste :
+d() { ./d.sh "$1"; }
+ff() { ./ff.sh "$1"; }
+run() { ./run.sh "$1"; }
+
+close terminal
+
+open new terminal, go to problem folder
+
+
+
+should work now
