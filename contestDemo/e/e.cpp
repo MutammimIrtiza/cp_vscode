@@ -86,15 +86,8 @@ void solve(){
 }
 
 int main() {
-    auto begin = std::chrono::high_resolution_clock::now();
-
-    ios_base::sync_with_stdio(false); cin.tie(NULL); 
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int t; cin >> t; while(t--)
     solve();
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    // cout << "\nTime measured: " << elapsed.count() * 1e-9 << " seconds.\n"; 
-    return 0;
 }

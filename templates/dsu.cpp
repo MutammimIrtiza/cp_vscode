@@ -43,14 +43,6 @@ struct DisjointSet {
         }
     }
 
-    ll getSize(ll node) {
-        return sz[findUlt(node)];
-    }
-
-    ll cccnt(){
-        return c;
-    }
-
     ll findUlt(ll node){ // findUPar
         if(par[node] == node) return node;
 
@@ -77,6 +69,8 @@ struct DisjointSet {
 
     }
 
+    ll getSize(ll node) { return sz[findUlt(node)]; }
+    ll cccnt(){ return c; }
 };
 
 

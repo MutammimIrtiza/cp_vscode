@@ -32,8 +32,8 @@ fi
 {
     echo -e "\nInput: "
     cat "$INPUT_FILE"
-    echo -e "\Output: "
+    echo -e "Output: "
     # Run the compiled executable with the input file
-    ./"$OUTPUT_FILE" < "$INPUT_FILE"
+    time ./"$OUTPUT_FILE" < "$INPUT_FILE"
     echo ""
 } | tee output.txt
