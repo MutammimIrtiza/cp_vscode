@@ -1,7 +1,6 @@
 struct mint {
     int x;
     mint() : x(0) {}
-    mint(int32_t xx) : x(xx % mod) { if (x < 0) x += mod; }
     mint(int64_t xx) : x(xx % mod) { if (x < 0) x += mod; }
     int val() const { return x; }
     mint& operator++() { if (++x == mod) x = 0; return *this; }

@@ -129,7 +129,5 @@
         }
     },
     "vim.startInInsertMode": true,
-
-
-
+    "vim.enabled": false
 }

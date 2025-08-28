@@ -16,8 +16,6 @@ using namespace __gnu_pbds;
 #define lld long double
 #define vll vector<long long>
 #define pll pair<long long, long long>
-#define vvll vector<vll>
-#define vvvll vector<vvll>
 #define ar array
 #define F first
 #define S second
@@ -30,8 +28,6 @@ using namespace __gnu_pbds;
 #define sz(x) (ll)(x.size())
 #define gp " "
 #define nl "\n"
-#define yes cout<<"YES"<<nl
-#define no cout<<"NO"<<nl
 
 #define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
@@ -55,6 +51,26 @@ const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
+vll z_function(string s) {
+    int n = s.size();
+    vll z(n);
+    ll l = 0, r = 0; // [l, r)
+    for(int i = 1; i < n; ++i) {
+        if(i < r) {
+            z[i] = min(z[i - l], r-i);
+        }
+        while(i + z[i] < n and s[z[i]] == s[i + z[i]]) {
+            z[i]++;
+        }
+        if(i + z[i] > r) {
+            l = i;
+            r = i + z[i];
+        }
+    }
+    return z;
+}
+
+
 void prep(){
     
 }
@@ -62,13 +78,19 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
-void solve(){
+void solve(){ // https://vjudge.net/contest/738971#problem/A
     
     // testcases ?
 
     // cleanup ?
 
-    
+    cin >> n;
+    string s; cin >> s;
+    vll z = z_function(s);
+    ll ans = 0;
+    for(ll el : z) ans = (ans + el + 1) % 10007;
+    cout << ans << nl;  
+
 }
 
 int main() {
