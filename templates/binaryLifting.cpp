@@ -61,19 +61,53 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
+vll gr[N];
+vvll lift(N, vll(20));    // binary lifting
+                        // up[node][j] = (1LL<<j)th ancestor of node
 
-void solve(){
+void dfs(ll node, ll par) {
+    lift[node][0] = par;
+    for(ll j = 1; j < 20; ++j) {
+        lift[node][j] = lift[ lift[node][j-1] ][j-1];
+    }
+
+    for(ll ch : gr[node]) {
+        if(ch == par) continue;
+        dfs(ch, node);
+    }
+}
+
+void solve(){  // https://cses.fi/problemset/task/1687
     
     // testcases ?
 
     // cleanup ?
 
+    cin >> n >> q;
+    L(i, 2, n) {
+        cin >> a[i];
+        gr[i].push_back(a[i]);
+        gr[a[i]].push_back(i);
+    }
+
+    dfs(1, 0); // 0 = DOES NOT EXIST. [use 0 not -1. helps for out of bound queries.]
+
+    while(q--) {
+        cin >> x >> k;
+        ll ans = x;
+        for(int i = 0; i < 64-clz(k); ++i) {
+            if(isSet(k, i)) {
+                ans = lift[ans][i];
+            }
+        }
+        cout << (ans ? ans : -1) << nl;
+    }
     
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
+    // int t; cin >> t; while(t--)
     solve();
 }

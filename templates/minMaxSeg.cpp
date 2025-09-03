@@ -92,12 +92,12 @@ struct minMaxSeg{
     vector<node> tree;
 
     minMaxSeg(vll & a) {
-        ll n = sz(a) - 1;                           // TODO: rem -1 for pref
+        ll n = sz(a) - 1;                           // TODO: rem -1 for 0 based
         size = 1; while(size < n) size *= 2;
         tree.assign(2 * size , node()); // 
 
-        For(i, 1, n) { // leaves (input array)
-            tree[size + i - 1] = a[i];              // TODO: rem -1 for pref
+        For(i, 1, n) { // leaves (input array)      // TODO: 0 to n-1 for 0 based
+            tree[size + i - 1] = a[i];              // TODO: rem -1 for 0 based
         }
         for(ll j = size - 1; j >= 1; j--) { // tree is 1 based
             pull(j);
@@ -126,7 +126,7 @@ struct minMaxSeg{
 
     node query(int ql, int qr){
         return query(1, 1, size, ql, qr);
-        // return query(1, 0, size-1, ql, qr); // pref
+        // return query(1, 0, size-1, ql, qr);                       // 0 based
     }
     node query(int pos, int l, int r, int ql, int qr) {
         push(pos, l, r);
@@ -144,7 +144,7 @@ struct minMaxSeg{
 
     void modify(int ql, int qr, ll y) {
         modify(1, 1, size, ql, qr, y);
-        // modify(1, 0, size-1, ql, qr, y); // pref
+        // modify(1, 0, size-1, ql, qr, y);                         // 0 based
     }
     void modify(int pos, int l, int r, int ql, int qr, ll y){
         push(pos, l, r);

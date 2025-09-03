@@ -1,4 +1,4 @@
-// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
+
 
 #include<bits/stdc++.h>
 using namespace std;
@@ -16,9 +16,12 @@ using namespace __gnu_pbds;
 #define lld long double
 #define vll vector<long long>
 #define pll pair<long long, long long>
+#define vvll vector<vll>
+#define vvvll vector<vvll>
 #define ar array
 #define F first
 #define S second
+
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
 #define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
@@ -26,33 +29,19 @@ using namespace __gnu_pbds;
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
 #define gp " "
+#define nl "\n"
+#define yes cout<<"YES"<<nl
+#define no cout<<"NO"<<nl
+
+#define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
 #define resetbit(x, i) (x & (~(1LL << i)))
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define getBit(x, i) (((x) >> (i)) & 1)
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
 
-template <typename T>
-struct ordered_multiset {
-    using Tpair = pair<T, int>;
-    tree<Tpair,null_type,less<Tpair>,rb_tree_tag,tree_order_statistics_node_update> t;
-    int _idx = 0;
-    void insert(const T &x) {
-        t.insert({x, _idx++});
-    }
-    void erase(const T &x) {
-        auto it = t.lower_bound({x, 0});
-        if (it != t.end() && it->first == x)
-            t.erase(it);
-    }
-    int order_of_key(const T &x) const {
-        return t.order_of_key({x, 0});
-    }
-    T find_by_order(int k) const {
-        auto it = t.find_by_order(k);
-        if (it == t.end()) return 1000000000;
-        return it->first;
-    }
-    int size() const { return t.size();}
-    bool empty() const { return t.empty();}
-};
 
 #ifdef LOCAL
 #include "debug.h"
@@ -61,128 +50,155 @@ struct ordered_multiset {
 #endif
 
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
+const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
-
-struct find_bridges_and_cutpoints { // black box
-    struct edge {
-        ll node, index;
-
-        edge() {}
-        edge(ll _node, ll _index) : node(_node), index(_index) {}
-    };
-
-    ll n, m;
-    vector<vector<edge>> adj;
-    vector<array<ll, 2>> edge_list;
-
-    vector<ll> tin, low, subtree_size;
-    vector<bool> visited, is_bridge, is_cutpoint;
-    ll timer;
-
-    find_bridges_and_cutpoints(ll _n = 0) {
-        init(_n);
-    }
-
-    void init(ll _n) {
-        n = _n;
-        m = 0;
-        adj.assign(n+1, {});
-        edge_list.clear();
-        tin.resize(n+1);
-        low.resize(n+1);
-        subtree_size.resize(n+1);
-    }
-
-    void add_edge(ll u, ll v) {
-        adj[u].emplace_back(v, m);
-        adj[v].emplace_back(u, m);
-        edge_list.push_back({u, v});
-        m++;
-    }
-
-    void dfs(ll u, ll parent_edge) {
-        visited[u] = true;
-        tin[u] = low[u] = timer++;
-        subtree_size[u] = 1;
-
-        ll children = 0;
-        bool cut = false;
-
-        for (edge &e : adj[u]) {
-            ll v = e.node;
-            if (e.index == parent_edge) continue;
-
-            if (visited[v]) {
-                // Back edge
-                low[u] = min(low[u], tin[v]);
-            } else {
-                dfs(v, e.index);
-                low[u] = min(low[u], low[v]);
-
-                if (low[v] > tin[u])
-                    is_bridge[e.index] = true;
-
-                if (low[v] >= tin[u] && parent_edge != -1)
-                    cut = true;
-
-                subtree_size[u] += subtree_size[v];
-                children++;
-            }
-        }
-
-        // Root condition
-        if (parent_edge == -1 && children > 1)
-            cut = true;
-
-        is_cutpoint[u] = cut;
-    }
-
-    void run() {
-        visited.assign(n+1, false);
-        is_bridge.assign(m, false);
-        is_cutpoint.assign(n+1, false);
-        subtree_size.assign(n+1, 0);
-        timer = 0;
-
-        for (ll i = 1; i <= n; ++i)
-            if (!visited[i])
-                dfs(i, -1);
-    }
-};
-
-
 
 void prep(){
     
 }
 
 ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), b(N);
+vll a(N), b(N); 
+vll gr[N];
+
+struct find_bridges_and_cutpoints { // nodes start from 1. edge numbering starts from 0. 
+                                    
+    struct edge {
+        ll node, index;
+        edge() {}
+        edge(ll _node, ll _index) : node(_node), index(_index) {}
+    };
+
+    ll n, m;
+    vector<vector<edge>> gr;
+    vector<array<ll, 2>> edge_list;
+    vector<bool> vis, is_active, is_bridge, is_cutpoint;
+    vector<ll> dp;
+    vector<ll> back_edge_up_cnt, back_edge_down_cnt;
+    vll parent, subtree_size, edge_type, depth;     // for solving problems
+                                                    // type0 = back edge, type1 = tree edge 
+
+    find_bridges_and_cutpoints(ll _n) {
+        n = _n;
+        m = 0;
+        gr.assign(n+1, {});
+        edge_list.clear();
+    }
+
+    void add_edge(ll u, ll v) {
+        gr[u].emplace_back(v, m);
+        gr[v].emplace_back(u, m);
+        edge_list.push_back({u, v});
+        m++;
+    }
+
+    void dfs(ll node, ll par_edge_idx, ll par) {
+        parent[node] = par;
+        if(par_edge_idx != -1) edge_type[par_edge_idx] = 1, depth[node] = depth[par]+1;
+        vis[node] = is_active[node] = true;
+        subtree_size[node] = 1;
+        ll ch_cnt = 0;
+
+        for(auto ch : gr[node]) {
+            if(ch.node == node) continue;
+            if(ch.index == par_edge_idx) continue;
+            
+            if(vis[ch.node]) {
+                if(is_active[ch.node]) {    // prevents considering a back-edge twice
+                    back_edge_down_cnt[ch.node]++;
+                    back_edge_up_cnt[node]++;
+                }
+            } else {
+                ll prev = back_edge_down_cnt[node];
+                dfs(ch.node, ch.index, node);
+                dp[node] += dp[ch.node];
+                ch_cnt++;
+                if(par_edge_idx != -1 and dp[ch.node] == back_edge_down_cnt[node] - prev) is_cutpoint[node] = true;
+                subtree_size[node] += subtree_size[ch.node];
+            }
+        }
+
+        if(par_edge_idx == -1 and ch_cnt > 1) is_cutpoint[node] = true;
+
+        dp[node] += back_edge_up_cnt[node] - back_edge_down_cnt[node];
+        if(par_edge_idx != -1) is_bridge[par_edge_idx] = (dp[node]==0);
+
+        is_active[node] = false;
+    }
+
+    void run() {
+        vis.assign(n+1, false);
+        is_active.assign(n+1, false);
+        is_bridge.assign(m, false);
+        is_cutpoint.assign(n+1, false);
+        dp.assign(n+1, 0);
+        back_edge_up_cnt.assign(n+1, 0);
+        back_edge_down_cnt.assign(n+1, 0);
+        parent.assign(n+1, 0);
+        subtree_size.assign(n+1, 0);
+        edge_type.assign(m+1, 0);
+        depth.assign(n+1, 0);
+
+        for (ll i = 1; i <= n; ++i)
+            if (!vis[i]) {
+                depth[i] = 0;
+                dfs(i, -1, -1);
+            }
+    }
+};
+
+vector<bool> vis(N);
+vll subtree_size(N);
+vll par(N);
+void dfs(ll node) {
+    vis[node] = 1;
+    subtree_size[node] = 1;
+    for(ll ch : gr[node]) {
+        if(vis[ch]) continue;
+        dfs(ch);
+        par[ch] = node;
+        subtree_size[node] += subtree_size[ch];
+    }
+}
 
 void solve(){
+    
+    // testcases ?
+
+    // cleanup ?
+    
     cin >> n >> m;
+
+    L(i, 1, n) {
+        gr[i].clear();
+        vis[i] = false;
+        subtree_size[i]=0;
+        par[i]= 0;
+    }
+
     find_bridges_and_cutpoints graph(n);
-    L(i, 1, m){
-        cin >> u >> v;
+    L(i, 1, m) {
+        cin >> u >> v; 
         graph.add_edge(u, v);
+        gr[u].push_back(v);
+        gr[v].push_back(u);
     }
     graph.run();
 
-    ll ans = 0;
-    L(i, 1, n) {
-        for(auto &e : graph.adj[i]) {
-            if(graph.is_bridge[e.index]) {
-                ll s1 = min(graph.subtree_size[i], graph.subtree_size[e.node]);
-                ll s2 = n - s1;
-                ans = max(ans, s1 * s2);
-            }
+    dfs(1);
+    ll mxrem = 0;
+    L(i, 0, m-1) {
+        if(graph.is_bridge[i]) {
+            ll ch;
+            auto [u, v] = graph.edge_list[i];
+            if(par[u]==v) ch=u;
+            else ch=v;
+            mxrem = max(mxrem, subtree_size[ch]*(n-subtree_size[ch]));
         }
     }
-    cout << (n*(n-1)/2 - ans) << endl;
-// dont forget to cleanup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+    cout << n*(n-1)/2 - mxrem << nl;
 }
 
 int main() {
