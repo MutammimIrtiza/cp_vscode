@@ -91,6 +91,7 @@ void mo_algo() { // Turn multiple subarray queries into a sliding window problem
     sort(queries.begin(), queries.end()); // magic. pointer moves are now at most sqrt(n)
 
     int curr_l = 1, curr_r = 0; // change if 0 based
+                                // move to global if needed            
     for (const auto &query : queries) {
         int l = query.l;
         int r = query.r;

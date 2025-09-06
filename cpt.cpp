@@ -16,9 +16,12 @@ using namespace __gnu_pbds;
 #define lld long double
 #define vll vector<long long>
 #define pll pair<long long, long long>
+#define vvll vector<vll>
+#define vvvll vector<vvll>
 #define ar array
 #define F first
 #define S second
+
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
 #define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
@@ -27,34 +30,18 @@ using namespace __gnu_pbds;
 #define sz(x) (ll)(x.size())
 #define gp " "
 #define nl "\n"
+#define yes cout<<"YES"<<nl
+#define no cout<<"NO"<<nl
+
+#define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
 #define resetbit(x, i) (x & (~(1LL << i)))
-#define isSet(x, i) ((x>>i)&1)
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define getBit(x, i) (((x) >> (i)) & 1)
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
 
-template <typename T>
-struct ordered_multiset {
-    using Tpair = pair<T, int>;
-    tree<Tpair,null_type,less<Tpair>,rb_tree_tag,tree_order_statistics_node_update> t;
-    int _idx = 0;
-    void insert(const T &x) {
-        t.insert({x, _idx++});
-    }
-    void erase(const T &x) {
-        auto it = t.lower_bound({x, 0});
-        if (it != t.end() && it->first == x)
-            t.erase(it);
-    }
-    int order_of_key(const T &x) const {
-        return t.order_of_key({x, 0});
-    }
-    T find_by_order(int k) const {
-        auto it = t.find_by_order(k);
-        if (it == t.end()) return 1000000000;
-        return it->first;
-    }
-    int size() const { return t.size();}
-    bool empty() const { return t.empty();}
-};
 
 #ifdef LOCAL
 #include "debug.h"
@@ -82,7 +69,6 @@ void solve(){
     // cleanup ?
 
     
-
 }
 
 int main() {

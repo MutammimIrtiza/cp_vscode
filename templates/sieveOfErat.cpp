@@ -13,3 +13,16 @@ void sieve(ll n) {
         if (is_prime[i]) primes.push_back(i);
     }
 }
+
+// spf (smallest prime factor) sieve
+vector<int> spf(10000005);
+void prep(){ // modified sieve
+    L(i, 2, 10000000) {
+        if(spf[i] == 0) {
+            spf[i] = i;
+            for(ll j = i * i; j <= 10000000; j += i) {
+                if(spf[j] == 0) spf[j] = i;
+            }
+        }
+    }
+}

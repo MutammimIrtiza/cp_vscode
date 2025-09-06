@@ -62,6 +62,7 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
+// LCA start
 vll gr[N];
 vvll lift(N, vll(20)); // binary lifting
 vll depth(N); // needed for distance calculation. dist(u, v) = depth[u] + depth[v] - 2*depth[find_lca(u, v)]
@@ -103,6 +104,7 @@ void prep_lca(ll root) {
     timer = 0;
     lca_dfs(root, -1, 0); 
 }
+// LCA end
 
 void solve(){
     
