@@ -62,49 +62,49 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
-// LCA start
 vll gr[N];
 vvll lift(N, vll(20)); // binary lifting
 vll depth(N); // needed for distance calculation. dist(u, v) = depth[u] + depth[v] - 2*depth[find_lca(u, v)]
 vll in_time(N), out_time(N);
 ll timer = 0;
-
-void lca_dfs(ll node, ll par, ll dep) {
-    in_time[node] = ++timer;
-    depth[node] = dep;
-    lift[node][0] = par;
-    for(int j = 1; j < 20; ++j) {
-        if(lift[node][j-1] == -1) lift[node][j] = -1;
-        else lift[node][j] = lift[ lift[node][j-1] ][j-1]; 
-    }
-    for(ll ch : gr[node]) {
-        if(ch == par) continue;
-        lca_dfs(ch, node, dep+1);
-    }
-    out_time[node] = ++timer;
-}
-
-// is u ancestor of v ?
-bool is_ancestor(ll u, ll v) {return in_time[u] < in_time[v] and out_time[u] > out_time[v];}
-
-ll find_lca(ll u, ll v) {
-    if(u == v) return u;
-    if(is_ancestor(u, v)) return u;
-    if(is_ancestor(v, u)) return v;
-
-    for(ll i = 19; i >= 0; --i) {
-        if(lift[u][i] != -1 and !is_ancestor(lift[u][i], v)) {
-            u = lift[u][i];
+namespace LCA {
+    void lca_dfs(ll node, ll par, ll dep) {
+        in_time[node] = ++timer;
+        depth[node] = dep;
+        lift[node][0] = par;
+        for(int j = 1; j < 20; ++j) {
+            if(lift[node][j-1] == -1) lift[node][j] = -1;
+            else lift[node][j] = lift[ lift[node][j-1] ][j-1]; 
         }
+        for(ll ch : gr[node]) {
+            if(ch == par) continue;
+            lca_dfs(ch, node, dep+1);
+        }
+        out_time[node] = ++timer;
     }
-    return lift[u][0];
+
+    // is u ancestor of v ?
+    bool is_ancestor(ll u, ll v) {return in_time[u] < in_time[v] and out_time[u] > out_time[v];}
+
+    ll find_lca(ll u, ll v) {
+        if(u == v) return u;
+        if(is_ancestor(u, v)) return u;
+        if(is_ancestor(v, u)) return v;
+
+        for(ll i = 19; i >= 0; --i) {
+            if(lift[u][i] != -1 and !is_ancestor(lift[u][i], v)) {
+                u = lift[u][i];
+            }
+        }
+        return lift[u][0];
+    }
+
+    void prep_lca(ll root) {
+        timer = 0;
+        lca_dfs(root, -1, 0); 
+    }
 }
 
-void prep_lca(ll root) {
-    timer = 0;
-    lca_dfs(root, -1, 0); 
-}
-// LCA end
 
 void solve(){
     
@@ -118,10 +118,10 @@ void solve(){
         gr[u].push_back(v);
         gr[v].push_back(u);
     }
-    prep_lca(1);
+    LCA::prep_lca(1);
     while(q--) {
         cin >> u >> v;
-        ll lca = find_lca(u, v);
+        ll lca = LCA::find_lca(u, v);
         cout << depth[u] + depth[v] - 2*depth[lca] << nl;
     }
 

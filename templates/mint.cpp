@@ -31,6 +31,15 @@ struct mint {
     explicit operator bool() const { return x != 0; }
 };
 
+mint power(mint a, int64_t n) {
+        mint res = 1;
+        while (n) {
+            if (n & 1) res *= a;
+            a *= a;
+            n >>= 1;
+        }
+        return res;
+}
 
 mint fact[N], inv_fact[N];
 void prep_factorials() {

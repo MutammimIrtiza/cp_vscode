@@ -23,3 +23,23 @@ bool solve_diophantine(long long a, long long b, long long c,
     if (b < 0) y = -y;
     return true;
 }
+
+bool solve_diophantine_non_neg(long long a, long long b, long long c,
+                                long long &x, long long &y, long long &g) {
+    if (!solve_diophantine(a, b, c, x, y, g)) return false;
+    long long dx = (b / g);
+    long long dy = (a / g);
+    if (x < 0) {
+        long long k =  (-x + abs(dx) - 1) / abs(dx); // ceil
+        if(dx < 0) k = -k;
+        x += k * dx;
+        y -= k * dy;
+    }
+    if (y < 0) {
+        long long k =  (-y + abs(dy) - 1) / abs(dy); 
+        if(dy < 0) k = -k;
+        y += k * dy;
+        x -= k * dx;
+    }
+    return x >= 0 and y >= 0;
+}

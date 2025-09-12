@@ -33,7 +33,7 @@
  
 ll n,m,k,q;
 ll a[N];
-ll dp[19][11][2][2];
+ll dp[][11][2][2]; // put max len of string + 1
  
 bool is_valid() {
     return 1; 

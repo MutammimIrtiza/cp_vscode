@@ -55,34 +55,36 @@ const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
-// Extended Euclidean Algorithm
-long long ext_gcd(long long a, long long b, long long &x, long long &y) {
-    if (b == 0) {
-        x = 1, y = 0;
-        return a;
-    }
-    long long x1, y1;
-    long long g = ext_gcd(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - (a / b) * y1;
-    return g;
-}
 
-inline long long normalize(long long x, long long mod) { x %= mod; if (x < 0) x += mod; return x; }
-inline long long LCM(long long a, long long b) { return a / gcd(a, b) * b; }
-pll CRT(vll &a, vll &m, ll n) { 
-    ll ans = a[1];
-    ll lcm = m[1];
-    L(i, 2, n) {
-        ll x1, y1;
-        ll g = ext_gcd(lcm, m[i], x1, y1);
-        if((a[i] - ans) % g != 0) {return {0, 0};} // no solution
-        ans = normalize(ans + x1 * (a[i] - ans) / g % (m[i] / g) * lcm, lcm * m[i] / g);
-        lcm = LCM(lcm, m[i]);
+namespace CRT {
+    // Extended Euclidean Algorithm
+    long long ext_gcd(long long a, long long b, long long &x, long long &y) {
+        if (b == 0) {
+            x = 1, y = 0;
+            return a;
+        }
+        long long x1, y1;
+        long long g = ext_gcd(b, a % b, x1, y1);
+        x = y1;
+        y = x1 - (a / b) * y1;
+        return g;
     }
-    return {ans, lcm};
-}
 
+    inline long long normalize(long long x, long long mod) { x %= mod; if (x < 0) x += mod; return x; }
+    inline long long LCM(long long a, long long b) { return a / gcd(a, b) * b; }
+    pll solve(vll &a, vll &m, ll n) { 
+        ll ans = a[1];
+        ll lcm = m[1];
+        L(i, 2, n) {
+            ll x1, y1;
+            ll g = ext_gcd(lcm, m[i], x1, y1);
+            if((a[i] - ans) % g != 0) {return {0, 0};} // no solution
+            ans = normalize(ans + x1 * (a[i] - ans) / g % (m[i] / g) * lcm, lcm * m[i] / g);
+            lcm = LCM(lcm, m[i]);
+        }
+        return {ans, lcm};
+    }
+}
 void prep(){
     
 }
@@ -98,9 +100,9 @@ void solve(){
     
     vll a(3), m(3); // size = no. of equations +1
     L(i, 1, 2) {
-        cin >> a[i] >> m[i]; normalize(a[i], m[i]);
+        cin >> a[i] >> m[i]; CRT::normalize(a[i], m[i]);
     }
-    pll x = CRT(a, m, 2);
+    pll x = CRT::solve(a, m, 2);
     if(x.F) cout << x.F << gp << x.S;
     else cout << "no solution";
     cout << nl;
