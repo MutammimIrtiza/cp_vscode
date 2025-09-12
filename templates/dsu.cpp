@@ -29,27 +29,38 @@
 
 
 struct DisjointSet {
-    vll par, sz; ll c;
-    // more vectors
+    vll par, sz; ll c; vll exp;
 
     DisjointSet(ll n){
-        sz.resize(n+1, 0LL); par.resize(n+1,0LL); c = n; 
-        // 
+        sz.resize(n+1, 0LL); par.resize(n+1,0LL); c = n; exp.resize(n+1, 0LL);
 
-        For(i, 0, n) {            // n+1 ???????????
+        For(i, 0, n) {
             par[i] = i, sz[i] = 1;
-            // 
-            
         }
     }
 
-    ll findUlt(ll node){ // findUPar
-        if(par[node] == node) return node;
+    ll getSize(ll node) {
+        return sz[findUlt(node)];
+    }
 
-        ll x = findUlt(par[node]);
+    ll cccnt(){
+        return c;
+    }
+
+    ll findUlt(ll node){ // findUPar
+        if(par[node] == node) return node; // root
+
+        ll x = findUlt(par[node]); // x = root
 
         // do stuff here if needed
-
+        // passing down is not needed for node just below root, coz connection stays
+        // else, connection will be gone due to path compression
+        // so we push down exp[par[node]] 
+        // NOT exp[x]. careful
+        // also, this par[node] is never going to store anything in future, so its ok
+        // bye bye par[node]. x is the new par. you have done your job and passed down :)
+        if(par[node] != x)  exp[node] += exp[par[node]];
+        
 
         par[node] = x; // path compression. remove ???
 
@@ -66,26 +77,48 @@ struct DisjointSet {
         sz[ulpu] += sz[ulpv]; 
 
         // do stuff here if needed
+        exp[ulpv] -= exp[ulpu]; // এখনই করে রাখতেসি, কারণ পরে উপর থেকে নিতেইইই হবে 
 
+        
     }
 
-    ll getSize(ll node) { return sz[findUlt(node)]; }
-    ll cccnt(){ return c; }
+    // extra functions
+
+    void addExp(ll node, ll val){
+        exp[findUlt(node)] += val;
+    }
+
+    ll getExp(ll node){
+        findUlt(node);
+        return exp[node] + (par[node] == node ? 0 : exp[par[node]]);
+        // exp[ulpu] + extra stored
+        // exp[ulpv] - exp[ulpu]
+        // sum = exp[ulpv] + extra stored
+
+        // for long chain, it works like induction and all extras are passed down :)
+    }
 };
 
 
 ll n,m,k,q;
 ll a[N];
 
-void solve(){
+void solve(){ // edu 1 C
     cin >> n >> q;
-    For(i, 1, n){
-        
-    }
 
     DisjointSet ds(n);
     while(q--){
-
+        string typ; cin >> typ;
+        if(typ == "add"){
+            ll node, val; cin >> node >> val; ds.addExp(node, val);
+        }
+        else if(typ == "join"){
+            ll u, v; cin >> u >> v; ds.Union(u,v);
+        }
+        else{
+            ll x; cin >> x;
+            cout << ds.getExp(x) << endl;
+        }
     }
 }
                         

@@ -58,7 +58,7 @@ struct Query {
 };
 
 ll n, m, x, y, z, q, kk, u, v, w;
-vll a(N), b(N);
+vll a(N), b(N);                                 // REMOVE FROM BELOW !!!
 vector<Query> queries; // dont forget to clear
 vll ans(N);
 ll curr_answer = 0; // dont forget to clear
