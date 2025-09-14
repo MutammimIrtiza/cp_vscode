@@ -62,6 +62,25 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
+vvll gr(N);
+vll subtree_size(N);
+
+void calc_subtree_size(ll node, ll par) {
+    subtree_size[node] = 1;
+    for(ll ch : gr[node]) {
+        if(ch == par) continue;
+        calc_subtree_size(ch, node);
+        subtree_size[node] += subtree_size[ch];
+    }
+}
+
+ll find_centroid(ll node, ll par) {
+    for(ll ch : gr[node]) {
+        if(ch == par) continue;
+        if(subtree_size[ch]*2 > n) return find_centroid(ch, node);
+    }
+    return node;
+}
 
 void solve(){
     
@@ -69,12 +88,19 @@ void solve(){
 
     // cleanup ?
 
-    
+    cin >> n;
+    L(i, 1, n-1) {
+        cin >> u >> v;
+        gr[u].push_back(v);
+        gr[v].push_back(u);
+    }
+    calc_subtree_size(1, 0);
+    cout << find_centroid(1, 0) << nl;
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
+    // int t; cin >> t; while(t--)
     solve();
 }

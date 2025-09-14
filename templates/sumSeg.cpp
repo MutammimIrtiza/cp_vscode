@@ -76,16 +76,16 @@ vll a(N), b(N);
 // update : range add
 struct sumSeg{
     struct node{
-        ll sum = 0;                                              // TODO
-        ll lazy = 0;                               // TODO : change both in push
+        ll sum = 0;
+        ll lazy = 0;
  
         node() {}
         node(ll x) : sum(x) {}
-        void apply(int l, int r, ll y) {                         // TODO
+        void apply(int l, int r, ll y) { 
             sum += y * (r - l + 1);
             if(l != r) lazy += y; // => applied here, but pending in children
-            // sum = y * (r - l + 1);               // assignment
-            // if(l != r) lazy = y;                 // assignment
+            // sum = y * (r - l + 1); // for range assignment
+            // if(l != r) lazy = y; // for range assignment
         }
     };
 
@@ -93,30 +93,30 @@ struct sumSeg{
     vector<node> tree;
 
     sumSeg(vll & a) {
-        ll n = sz(a) - 1;                           // TODO: rem -1 for pref
+        ll n = sz(a);          
         size = 1; while(size < n) size *= 2;
-        tree.assign(2 * size , node()); // 
+        tree.assign(2 * size , node()); 
 
-        For(i, 1, n) { // leaves (input array)
-            tree[size + i - 1] = a[i];              // TODO: rem -1 for pref
+        For(i, 0, n-1) { // leaves (input array)
+            tree[size + i] = a[i];
         }
-        for(ll j = size - 1; j >= 1; j--) { // tree is 1 based
+        for(ll j = size - 1; j >= 1; j--) { 
             pull(j);
         }
     }
 
     node unite(node a, node b){
         node res;
-        res.sum = a.sum + b.sum;                                // TODO
+        res.sum = a.sum + b.sum; 
         return res;
     }
     void push(int pos, int l, int r){
         if(l == r) return;
-        if (tree[pos].lazy != 0) {                            // TODO
+        if (tree[pos].lazy != 0) {
             int mid = (l + r) / 2;
             tree[2*pos].apply(l, mid, tree[pos].lazy);
             tree[2*pos+1].apply(mid+1, r, tree[pos].lazy);
-            tree[pos].lazy = 0;                                 // TODO
+            tree[pos].lazy = 0;                             // default lazy 
         }
     }
     void pull(int pos){
@@ -125,8 +125,7 @@ struct sumSeg{
 
 
     node query(int ql, int qr){
-        return query(1, 1, size, ql, qr);
-        // return query(1, 0, size-1, ql, qr); // pref
+        return query(1, 0, size-1, ql, qr);
     }
     node query(int pos, int l, int r, int ql, int qr) {
         push(pos, l, r);
@@ -137,14 +136,12 @@ struct sumSeg{
         else if (ql > mid) res = query(pos * 2 + 1, mid + 1, r, ql, qr);
         else res = unite(query(pos * 2, l, mid, ql, qr), 
                             query(pos * 2 + 1, mid + 1, r,  ql, qr));
-        pull(pos);
         return res;
     }
 
 
     void modify(int ql, int qr, ll y) {
-        modify(1, 1, size, ql, qr, y);
-        // modify(1, 0, size-1, ql, qr, y); // pref
+        modify(1, 0, size-1, ql, qr, y);
     }
     void modify(int pos, int l, int r, int ql, int qr, ll y){
         push(pos, l, r);
@@ -165,28 +162,17 @@ void prep(){
 
 
 void solve(){
-    cin >> n; 
-    vll a(n+1);
-    L(i, 1, n) cin >> a[i];
-    sumSeg st(a);
-    // cout << st.query(5, 6).mx << gp << st.query(5, 6).mn << endl << nl;
-    // cout << st.size << endl;
-    cout << nl;
+    
     
 // dont forget to cleanup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 }
 
 int main() {
-    auto begin = std::chrono::high_resolution_clock::now();
 
     ios_base::sync_with_stdio(false); cin.tie(NULL); 
     prep();
     // int t; cin >> t; while(t--)
     solve();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    // cout << "\nTime measured: " << elapsed.count() * 1e-9 << " seconds.\n"; 
-    return 0;
 }

@@ -1,60 +1,126 @@
-struct tarjan_scc {
-    ll n, timer, scc_count;
-    vector<vector<ll>> adj;
-    vector<ll> tin, low, comp_id;
-    vector<bool> on_stack;
-    stack<ll> st;
+// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
 
-    tarjan_scc(ll _n = 0) {
-        init(_n);
+#include<bits/stdc++.h>
+using namespace std;
+
+// Extra functionality :
+// *st.find_by_order(index) = value at index
+// st.order_of_key(value) = number of elements strictly less than value
+
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+
+#define ll long long
+#define lld long double
+#define vll vector<long long>
+#define pll pair<long long, long long>
+#define vvll vector<vll>
+#define vvvll vector<vvll>
+#define ar array
+#define F first
+#define S second
+
+#define all(v) v.begin(),v.end()
+#define range(v, i, j) v.begin()+i, v.begin()+j+1
+#define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
+#define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
+#define R(i, a, b) for(long long i = (a); i >= (b); --(i))
+#define sz(x) (ll)(x.size())
+#define gp " "
+#define nl "\n"
+#define yes cout<<"YES"<<nl
+#define no cout<<"NO"<<nl
+
+#define isSet(x, i) ((x>>i)&1)
+#define setbit(x, i) (x | (1LL<<i))
+#define resetbit(x, i) (x & (~(1LL << i)))
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define getBit(x, i) (((x) >> (i)) & 1)
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
+
+
+#ifdef LOCAL
+#include "debug.h"
+#else
+#define deb(...) (void)0
+#endif
+
+mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
+const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
+const lld pi = 2*acos(0.0);
+const int mod = 1e9 + 7;
+const int N = 1000005; ///////////////////////////////////////
+const ll inf = 1e15; /////////////////////////////////////////////
+
+void prep(){
+    
+}
+
+ll n, m, x, y, z, q, k, u, v, w;
+vll a(N), b(N); 
+vvll gr(N), revgr(N);
+vector<bool> vis(N);
+stack<ll> st;
+void dfs1(ll node) {
+    vis[node] = 1;
+    for(ll ch : gr[node]) {
+        if(!vis[ch]) dfs1(ch);
     }
-
-    void init(ll _n) {
-        n = _n;
-        timer = 0;
-        scc_count = 0;
-        adj.assign(n, {});
-        tin.assign(n, -1);
-        low.assign(n, -1);
-        comp_id.assign(n, -1); // id of which SCC each node belongs to
-        on_stack.assign(n, false);
-        while (!st.empty()) st.pop();
+    st.push(node);
+}
+void dfs2(ll node, vll &comp) {
+    vis[node] = 1;
+    comp.push_back(node);
+    for(ll ch : revgr[node]) {
+        if(!vis[ch]) dfs2(ch, comp);
     }
-
-    void add_edge(ll u, ll v) {
-        adj[u].push_back(v); // directed edge
-    }
-
-    void dfs(ll u) {
-        tin[u] = low[u] = timer++;
-        st.push(u);
-        on_stack[u] = true;
-
-        for (ll v : adj[u]) {
-            if (tin[v] == -1) {
-                dfs(v);
-                low[u] = min(low[u], low[v]);
-            } else if (on_stack[v]) {
-                low[u] = min(low[u], tin[v]);
-            }
+}
+vvll kosaraju() {
+    vvll comps;
+    L(i, 1, n) if(!vis[i]) dfs1(i);
+    L(i, 1, n) vis[i] = 0;
+    while(st.size()) {
+        ll now = st.top(); st.pop();
+        if(!vis[now]) {
+            vll comp;
+            dfs2(now, comp);
+            comps.push_back(comp);
         }
+    }
+    return comps;
+}
 
-        if (low[u] == tin[u]) {
-            // Found a new SCC
-            while (true) {
-                ll v = st.top();
-                st.pop();
-                on_stack[v] = false;
-                comp_id[v] = scc_count;
-                if (v == u) break;
-            }
-            scc_count++;
+void solve(){
+    
+    // testcases ?
+
+    // cleanup ?
+
+    cin >> n >> m;
+    L(i, 1, m) {
+        cin >> u >> v;
+        gr[u].push_back(v);
+        revgr[v].push_back(u);
+    }
+    
+    vvll comps = kosaraju();
+    vll tag(n+1);
+    L(i, 1, sz(comps)) {
+        for(ll node : comps[i-1]) {
+            tag[node] = i;
         }
     }
+    cout << sz(comps) << nl;
+    L(i, 1, n) cout << tag[i] << gp;
+}
 
-    void find_scc() {
-        for (ll i = 0; i < n; ++i)
-            if (tin[i] == -1)
-                dfs(i);
-    }
-};
+int main() {
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    prep();
+    // int t; cin >> t; while(t--)
+    solve();
+}
