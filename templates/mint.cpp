@@ -87,3 +87,5 @@ mint nCr(long long n, long long r) {
     else if (r < N) return nCr_loop(n, r);
     else {cout << "parina" << nl; exit(0);}
 }
+
+

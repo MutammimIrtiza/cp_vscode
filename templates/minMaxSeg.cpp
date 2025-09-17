@@ -16,9 +16,12 @@ using namespace __gnu_pbds;
 #define lld long double
 #define vll vector<long long>
 #define pll pair<long long, long long>
+#define vvll vector<vll>
+#define vvvll vector<vvll>
 #define ar array
 #define F first
 #define S second
+
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
 #define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
@@ -27,34 +30,18 @@ using namespace __gnu_pbds;
 #define sz(x) (ll)(x.size())
 #define gp " "
 #define nl "\n"
+#define yes cout<<"YES"<<nl
+#define no cout<<"NO"<<nl
+
+#define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
 #define resetbit(x, i) (x & (~(1LL << i)))
-#define isSet(x, i) ((x>>i)&1)
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define getBit(x, i) (((x) >> (i)) & 1)
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
 
-template <typename T>
-struct ordered_multiset {
-    using Tpair = pair<T, int>;
-    tree<Tpair,null_type,less<Tpair>,rb_tree_tag,tree_order_statistics_node_update> t;
-    int _idx = 0;
-    void insert(const T &x) {
-        t.insert({x, _idx++});
-    }
-    void erase(const T &x) {
-        auto it = t.lower_bound({x, 0});
-        if (it != t.end() && it->first == x)
-            t.erase(it);
-    }
-    int order_of_key(const T &x) const {
-        return t.order_of_key({x, 0});
-    }
-    T find_by_order(int k) const {
-        auto it = t.find_by_order(k);
-        if (it == t.end()) return 1000000000;
-        return it->first;
-    }
-    int size() const { return t.size();}
-    bool empty() const { return t.empty();}
-};
 
 #ifdef LOCAL
 #include "debug.h"
@@ -64,34 +51,37 @@ struct ordered_multiset {
 
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
+const lld pi = 2*acos(0.0);
 const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
-
-ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), b(N);
-
-// query : min max
-// update : range assignment
-struct minMaxSeg{
+// query : min max sum
+// update : range addition
+struct Seg{
     struct node{
         ll mn = inf;
         ll mx = -inf;
-        ll lazy = inf;
+        ll lazy = 0;
+        ll sum = 0;
  
         node() {}
-        node(ll x) : mn(x), mx(x) {}
+        node(ll x) : mn(x), mx(x), sum(x) {}
         void apply(int l, int r, ll y) {
-            mn = mx = y;
-            if(l != r) lazy = y; // => applied here, but pending in children
+            mn += y; mx += y;
+            sum += y * (r - l + 1);
+            if(l != r) lazy += y;    // => applied here, but pending in children
+
+            // mn = mx = y;          // for range assignment
+            // sum = y * (r - l + 1) // for range assignment
+            // if(l != r) lazy = y;  // for range assignment
         }
     };
 
     int size;
     vector<node> tree;
 
-    minMaxSeg(vll & a) {
+    Seg(vll & a) {
         ll n = sz(a);
         size = 1; while(size < n) size *= 2;
         tree.assign(2 * size , node()); 
@@ -108,6 +98,7 @@ struct minMaxSeg{
         node res;
         res.mn = min(a.mn, b.mn);
         res.mx = max(a.mx, b.mx);
+        res.sum = a.sum + b.sum;
         return res;
     }
     void push(int pos, int l, int r){
@@ -116,7 +107,7 @@ struct minMaxSeg{
             int mid = (l + r) / 2;
             tree[2*pos].apply(l, mid, tree[pos].lazy);
             tree[2*pos+1].apply(mid+1, r, tree[pos].lazy);
-            tree[pos].lazy = inf;                           // default lazy
+            tree[pos].lazy = 0;                           // default lazy
         }
     }
     void pull(int pos){
@@ -161,16 +152,39 @@ void prep(){
     
 }
 
+ll n, m, x, y, z, q, k, u, v, w;
+vll a(N), b(N); 
 
 void solve(){
     
+    // testcases ?
 
-// dont forget to cleanup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // cleanup ?
 
+    cin >> n >> q;
+    vll a(n);
+    L(i, 0, n-1) {
+        cin >> a[i];
+    }
+
+    Seg seg(a);
+
+    while(q--) {
+        int typ; cin >> typ;
+        ll l, r;
+        if(typ==1) {
+            cin >> l >> r >> x;
+            seg.modify(--l, --r, x);
+        } else {
+            cin >> l >> r;
+            cout << seg.query(--l, --r).mn << nl;
+        }
+    }
+    
 }
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(NULL); 
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     // int t; cin >> t; while(t--)
     solve();

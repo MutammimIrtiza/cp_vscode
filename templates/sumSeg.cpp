@@ -73,8 +73,8 @@ ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N);
 
 // query : range sum
-// update : range add
-struct sumSeg{
+// update : range addition
+struct Seg{
     struct node{
         ll sum = 0;
         ll lazy = 0;
@@ -92,7 +92,7 @@ struct sumSeg{
     int size;
     vector<node> tree;
 
-    sumSeg(vll & a) {
+    Seg(vll & a) {
         ll n = sz(a);          
         size = 1; while(size < n) size *= 2;
         tree.assign(2 * size , node()); 
