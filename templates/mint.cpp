@@ -32,15 +32,15 @@ struct mint {
 };
 
 mint power(mint a, int64_t n) {
-        mint res = 1;
-        while (n) {
-            if (n & 1) res *= a;
-            a *= a;
-            n >>= 1;
-        }
-        return res;
+    mint res = 1;
+    while (n) {
+        if (n & 1) res *= a;
+        a *= a;
+        n >>= 1;
+    }
+    return res;
 }
-
+INITIALIZE FACTORIALZ !!!!!!!!!
 mint fact[N], inv_fact[N];
 void prep_factorials() {
     fact[0] = 1;
