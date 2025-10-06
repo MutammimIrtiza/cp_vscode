@@ -51,21 +51,27 @@ using namespace __gnu_pbds;
 
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
+const lld pi = 2*acos(0.0);
 const int mod = 1e9 + 7;
-const int N = 1000005; ///////////////////////////////////////
+const int N = 1000006; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
-
-#include <bits/stdc++.h>
-using namespace std;
-
+/*
+    each state of the automaton is a prefix of some string, since this is built on top of a trie
+    suffix link of current state is the state which is the longest suffix of current state
+    note that both current state and it's suffix link are states, so they are prefix of some pattern, may be of different ones
+    terminal link is the first state in the chain of suffix links having output = true
+    if no valid link/terminal link exists, it points to root (0)
+    suffix links form a tree. [terminal links also form a tree ig?]
+    if alphabet size is large, we can work with only suffix links and trie transitions.
+*/
 struct Aho {
     static const int K = 26; // alphabet size
     struct Vertex {
-        int next[K];      // trie edges
+        int next[K];      // transitions [each state initially has trie edges only. after building automaton, has all 26]
         int link;         // suffix link
         int term_link;    // terminal link (output link)
         bool output;      // true if this node is end of some pattern
-        vector<int> ids;  // pattern ids ending here
+        vector<int> ids;  // pattern ids ending here. if patterns are unique, this should have 1 element only, else multiple
         int len;
 
         Vertex() {
@@ -95,9 +101,10 @@ struct Aho {
     }
 
     // Build suffix and terminal links
-    void build_automaton() {
+    void build_automaton() { build the automaton T.T
         queue<int> q;
         t[0].link = 0;
+        t[0].term_link = 0;
 
         for (int c = 0; c < K; c++) {
             int u = t[0].next[c];
@@ -127,14 +134,12 @@ struct Aho {
             }
 
             // compute terminal link
-            if (t[t[v].link].output)
-                t[v].term_link = t[v].link;
-            else
-                t[v].term_link = t[t[v].link].term_link;
+            if (t[t[v].link].output) t[v].term_link = t[v].link;
+            else t[v].term_link = t[t[v].link].term_link;
+                
         }
     }
 };
-
 
 void prep(){
     
@@ -143,32 +148,41 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
-void solve(){
+void solve(){ // https://cses.fi/problemset/result/14686177/
     
     // testcases ?
 
     // cleanup ?
 
-    string s; cin >> s; n = sz(s); s = ' ' + s;
+    string s; cin >> s;
     cin >> k;
+    string pat;
     Aho aho;
-    string p;
     L(i, 1, k) {
-        cin >> p; aho.add_string(p, i);
+        cin >> pat; 
+        aho.add_string(pat, i);
     }
     aho.build_automaton();
-    vll dp(n+1); dp[0] = 1;
     ll cur = 0;
-    L(i, 1, n) {
-        cur = aho.t[cur].next[s[i] - 'a'];
-        ll tem = cur;
-        if(!aho.t[tem].output) tem = aho.t[tem].term_link;
-        while(tem != -1) {
-            dp[i] += dp[i - aho.t[tem].len]; dp[i] %= mod;
-            tem = tem = aho.t[tem].term_link;
+    vector<bool> found(k+1);
+    vector<bool> vis(aho.t.size()); // vis[state] = 1 => ive been here before, so every id here, AND every id in teminal links till root, have been marked found
+    for(char c : s) {
+        cur = aho.t[cur].next[c-'a'];
+        if(vis[cur]) continue; 
+        vis[cur] = 1;
+
+        for(int id : aho.t[cur].ids) found[id] = 1;
+        int tem = aho.t[cur].term_link;
+        assert(tem != -1);
+
+        while(tem) {
+            if(vis[tem]) break;
+            vis[tem] = 1;
+            for(int id : aho.t[tem].ids) found[id] = 1;
+            tem = aho.t[tem].term_link;
         }
     }
-    cout << dp[n] << nl;
+    L(i,1,k) found[i] ? yes : no;
 }
 
 int main() {

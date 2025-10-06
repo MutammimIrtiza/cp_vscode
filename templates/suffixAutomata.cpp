@@ -56,11 +56,47 @@ const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 
+/*
+    Paths from the start form substrings of the main string, and ALL substrings are included
+    There can be multiple paths leading to a state
+    The state corresponds to strings formed by those paths
+    starting from the initial state, EVERY SUBSTRING can be formed.
+
+    ...cab...cab...cab...
+    endpos_set(string p) = set of all positions in main string where p ends, i.e. p is a suffix if we cut the string there...
+    each state corresponds to one or more subsrings having same endpos_set !
+    obviously, all of them are suffixes of the biggest 
+    their lengths form a certain interval [x:y]
+    the first few suffixes (decreasing length) of the biggest are included here
+    they are together called an equivalence class
+    the remaining smaller suffixed occur in more places, so they are in some other state
+    
+    ...cab...cab...cab...jab...jab
+    if string p1 is a suffix of p2, and occurs in more positions than p2, then obviously they are in different states
+    in this case, endpos_set(p2) is a subset of endpos_set(p1)
+    
+    suffix link of current state leads to the state having the longest suffix that is absent here
+    suffix links form a tree 
+    minlen(state) = maxlen(link(state)) + 1
+
+    what does a transition mean in suffix automaton?
+    if there is a transition from state p to state q of character c, 
+    then all the strings of p, appended by c, will be in q
+    we might think maxlen[q] = maxlen[p] + 1
+    but no, q might have more strings
+    so, maxlen[q] >= maxlen[p] + 1
+    
+    if the strings of a state are suffixes of the main array, the state is a terminal state
+
+    number of different substrings = for all states (1 to sz(st)-1), sum maxlen[i] - maxlen[link[i]]
+
+    start from ANY state, follow transitions, whay you get is a substring.
+*/
 struct SAM {
     struct State {
         int link, len;
-        array<int,26> next;
-        State() { link = -1; len = 0; next.fill(-1); }
+        map<char,int> next;  
+        State() { link = -1; len = 0; }
     };
     vector<State> st;
     int last, sz;
@@ -75,26 +111,25 @@ struct SAM {
     }
 
     void extend(char c) {
-        int ch = c - 'a';
         int cur = sz++;
         st[cur].len = st[last].len + 1;
         int p = last;
-        while (p != -1 && st[p].next[ch] == -1) {
-            st[p].next[ch] = cur;
+        while (p != -1 && !st[p].next.count(c)) { 
+            st[p].next[c] = cur;
             p = st[p].link;
         }
         if (p == -1) {
             st[cur].link = 0;
         } else {
-            int q = st[p].next[ch];
+            int q = st[p].next[c];
             if (st[p].len + 1 == st[q].len) {
                 st[cur].link = q;
             } else {
                 int clone = sz++;
-                st[clone] = st[q];
+                st[clone] = st[q]; 
                 st[clone].len = st[p].len + 1;
-                while (p != -1 && st[p].next[ch] == q) {
-                    st[p].next[ch] = clone;
+                while (p != -1 && st[p].next[c] == q) {
+                    st[p].next[c] = clone;
                     p = st[p].link;
                 }
                 st[q].link = st[cur].link = clone;
@@ -103,7 +138,11 @@ struct SAM {
         last = cur;
         total += st[cur].len - st[st[cur].link].len;
     }
+
+    // after adding the entire string, if you need to mark terminal states, do the following:
+    // start from last, go back by suffix links. all the visited states are terminal states
 };
+
 
 void prep(){
     

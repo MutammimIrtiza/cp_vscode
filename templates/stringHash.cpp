@@ -51,41 +51,42 @@ const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
-struct DoubleHash {
-    using u64 = uint64_t;
-    static inline const u64 mod1 = 1000000007;   
-    static inline const u64 mod2 = 1000000009;   
-    static inline const u64 base = mt19937_64{random_device{}()}() % (mod1 - 256) + 256;
+using u64 = uint64_t;
+struct StringHash {
+    static constexpr u64 mod = (1ull<<61) - 1;
+    static inline const u64 base = uniform_int_distribution<ll>(256, mod - 1)(rnd);
 
     ll n; 
-    vector<u64> hash1, pow1, hash2, pow2;
+    vector<u64> hash, pow;
 
-    static u64 add(u64 a, u64 b, u64 mod) {
+    static u64 add(u64 a, u64 b) {
         a += b;
         if (a >= mod) a -= mod;
         return a;
     }
-    static u64 mul(u64 a, u64 b, u64 mod) {
-        return (a * b) % mod;
+
+    u64 mul(u64 a, u64 b) const {
+        u64 l1 = (uint32_t)a, h1 = a>>32, l2 = (uint32_t)b, h2 = b>>32;
+        u64 l = l1*l2, m = l1*h2 + l2*h1, h = h1*h2;
+        u64 ret = (l&mod) + (l>>61) + (h << 3) + (m >> 29) + (m << 35 >> 3) + 1;
+        ret = (ret & mod) + (ret>>61);
+        ret = (ret & mod) + (ret>>61);
+        return ret-1;
     }
 
-    DoubleHash(const string& s) : n(s.size()), 
-        hash1(n + 1), pow1(n + 1, 1),
-        hash2(n + 1), pow2(n + 1, 1) 
+    StringHash(const string& s) : n(s.size()), 
+        hash(n + 1), pow(n + 1, 1)
     {
         for (ll i = 0; i < n; i++) {
-            pow1[i + 1] = mul(pow1[i], base, mod1);
-            pow2[i + 1] = mul(pow2[i], base, mod2);
-            hash1[i + 1] = add(mul(hash1[i], base, mod1), s[i], mod1);
-            hash2[i + 1] = add(mul(hash2[i], base, mod2), s[i], mod2);
+            pow[i + 1] = mul(pow[i], base);
+            hash[i + 1] = add(mul(hash[i], base), s[i]);
         }
     }
 
-    // return pair of hashes for substring [l, r)
-    pair<u64,u64> get(ll l, ll r) const {
-        u64 x1 = add(hash1[r], mod1 - mul(hash1[l], pow1[r - l], mod1), mod1);
-        u64 x2 = add(hash2[r], mod2 - mul(hash2[l], pow2[r - l], mod2), mod2);
-        return {x1, x2};
+    // return hash for substring [l, r]
+    u64 get(ll l, ll r) const {
+        u64 x = add(hash[r+1], mod - mul(hash[l], pow[r+1 - l]));
+        return x;
     }
 
     // helper: compare two substrings in O(1)
@@ -109,7 +110,7 @@ void solve(){ // https://cses.fi/problemset/task/1753/
     // cleanup ?
 
     string s, p; cin >> s >> p;
-    DoubleHash sh(s), ph(p);
+    StringHash sh(s), ph(p);
     auto patternHash = ph.get(0, p.size());
     int ans = 0;
     L(i, 0, sz(s) - sz(p)) {
@@ -124,3 +125,5 @@ int main() {
     // int t; cin >> t; while(t--)
     solve();
 }
+
+

@@ -22,7 +22,7 @@ OUTPUT_FILE="a.exe"
 DEBUG_PATH="/mnt/c/Users/Mutammim/Desktop/cp_vscode/DEBUG"
 
 # Compile the C++ file (release/fast version)
-g++ -std=c++17 -I "$DEBUG_PATH" -Wshadow -Wall -O2 -Wno-unused-result "$CPP_FILE" -o "$OUTPUT_FILE"
+g++ -std=c++17 -I -O2 -Wno-unused-result "$CPP_FILE" -o "$OUTPUT_FILE"
 if [ $? -ne 0 ]; then
     echo "Compilation failed."
     exit 1

@@ -3,6 +3,84 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+namespace cfdebugger{
+	// the test case you want to know
+	const int _Errorcase=3412;
+	// replace "_identity" with the first few lines of the test data 
+	// this is an example
+	string _identity=R"(
+10000
+1
+0
+1
+1
+2
+00
+2
+10
+2
+01
+2
+11
+3
+000
+3
+100
+3
+010
+3
+110
+3
+001
+3
+101
+3
+011
+3
+111
+)";
+	
+	stringstream _ss;
+	void main(){
+		string _s;
+		bool _is_bad=1;
+		int _ii=0;
+		_identity.erase(0,1);
+		_identity.pop_back();
+		while(getline(cin,_s)){
+			_s+='\n';
+			for(const char &c:_s){
+				if(_ii>=_identity.size()) break;
+				if(c!=_identity[_ii]) _is_bad=0;
+				_ii++;
+			}
+			_ss<<_s;
+		}
+		if(!_is_bad) return ;
+		stringstream _tmp;
+		_tmp.str(_ss.str());
+		#define cin _tmp
+		int _T; cin>>_T;
+		for(int _test=1;_test<=_T;_test++){
+			// input, following is an example, replace them with your input
+			int n; string s; cin>>n>>s;
+			
+			if(_test==_Errorcase){
+				// output, following is an example, replace them with your output
+				cout<<n<<' '<<s<<'\n';
+				
+				cout<<"\nError Case End\n";
+				exit(0);
+			}
+		}
+		#undef cin
+	}
+}
+#define cin cfdebugger::_ss
+// your code below
+
+
+
 // Extra functionality :
 // *st.find_by_order(index) = value at index
 // st.order_of_key(value) = number of elements strictly less than value
@@ -53,7 +131,7 @@ mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const lld pi = 2*acos(0.0);
 const int mod = 1e9 + 7;
-const int N = 1000005; ///////////////////////////////////////
+const int N = 1000006; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 void prep(){
@@ -62,37 +140,6 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
-vvll gr(N), revgr(N);
-vector<bool> vis(N);
-stack<ll> st;
-void dfs1(ll node) {
-    vis[node] = 1;
-    for(ll ch : gr[node]) {
-        if(!vis[ch]) dfs1(ch);
-    }
-    st.push(node);
-}
-void dfs2(ll node, vll &comp) {
-    vis[node] = 1;
-    comp.push_back(node);
-    for(ll ch : revgr[node]) {
-        if(!vis[ch]) dfs2(ch, comp);
-    }
-}
-vvll kosaraju() {  // returns comps in topological order
-    vvll comps;
-    L(i, 1, n) if(!vis[i]) dfs1(i);
-    L(i, 1, n) vis[i] = 0;
-    while(st.size()) {
-        ll now = st.top(); st.pop();
-        if(!vis[now]) {
-            vll comp;
-            dfs2(now, comp);
-            comps.push_back(comp);
-        }
-    }
-    return comps;
-}
 
 void solve(){
     
@@ -100,27 +147,34 @@ void solve(){
 
     // cleanup ?
 
-    cin >> n >> m;
-    L(i, 1, m) {
-        cin >> u >> v;
-        gr[u].push_back(v);
-        revgr[v].push_back(u);
-    }
-    
-    vvll comps = kosaraju();
-    vll tag(n+1);
-    L(i, 1, sz(comps)) {
-        for(ll node : comps[i-1]) {
-            tag[node] = i;
+    cin >> n;
+    string s; cin >> s; s = '1' + s + '1';
+    vll dir(n+2);
+    L(i, 2, n-1)  {
+        if(s[i]=='0') {
+            if(s[i+1]=='0' and s[i-1]=='0') continue;
+            if(s[i-1]=='1' and s[i-2]=='1') {
+                dir[i] = 1;
+            }
+            if(s[i+1]=='1' and s[i+2]=='1') {
+                if(dir[i]==1) {no; return;}
+                dir[i] = -1;
+                if(s[i-1]=='1' and dir[i-2]==-1) {no; return;}
+            }
+            if(s[i-1]=='1') {
+                if(dir[i-2]==1) dir[i]=-1;
+                else dir[i]=1;
+            }
         }
     }
-    cout << sz(comps) << nl;
-    L(i, 1, n) cout << tag[i] << gp;
+    L(i, 1, n) if(dir[i]==1) if()
+    yes;
 }
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    // ios_base::sync_with_stdio(false); cin.tie(NULL);
+    cfdebugger::main();
     prep();
-    // int t; cin >> t; while(t--)
+    int t; cin >> t; while(t--)
     solve();
 }

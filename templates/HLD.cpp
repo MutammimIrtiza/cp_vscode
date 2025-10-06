@@ -56,33 +56,28 @@ const int mod = 1e9 + 7;
 const int N = 200005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
-// query : min max sum
-// update : range addition
-// LAZY HAS TO BE 0 FOR RANGE ADDITION. NOT INF
 struct Seg{
     struct node{
-        ll mn = inf;
         ll mx = -inf;
-        ll lazy = 0;
-        ll sum = 0;
+        ll lazy = inf;
  
         node() {}
-        node(ll x) : mn(x), mx(x), sum(x) {}
+        node(ll x) :  mx(x) {}
         void apply(int l, int r, ll y) {
-            mn += y; mx += y;
-            sum += y * (r - l + 1);
-            if(l != r) lazy += y;    // => applied here, but pending in children
+            // mn += y; mx += y;
+            // sum += y * (r - l + 1);
+            // if(l != r) lazy += y;    // => applied here, but pending in children
 
-            // mn = mx = y;          // for range assignment
-            // sum = y * (r - l + 1) // for range assignment
-            // if(l != r) lazy = y;  // for range assignment
+            mx = y;          // for range assignment
+            // sum = y * (r - l + 1); // for range assignment
+            if(l != r) lazy = y;  // for range assignment
         }
     };
 
     int size;
     vector<node> tree;
 
-    Seg(vll & a) {
+    Seg(vector<int> & a) {
         ll n = sz(a);
         size = 1; while(size < n) size *= 2;
         tree.assign(2 * size , node()); 
@@ -97,18 +92,18 @@ struct Seg{
 
     node unite(node a, node b){ 
         node res;
-        res.mn = min(a.mn, b.mn);
+        // res.mn = min(a.mn, b.mn);
         res.mx = max(a.mx, b.mx);
-        res.sum = a.sum + b.sum;
+        // res.sum = a.sum + b.sum;
         return res;
     }
     void push(int pos, int l, int r){
         if(l == r) return;
-        if (tree[pos].lazy != 0) {  
+        if (tree[pos].lazy != inf) {  
             int mid = (l + r) / 2;
             tree[2*pos].apply(l, mid, tree[pos].lazy);
             tree[2*pos+1].apply(mid+1, r, tree[pos].lazy);
-            tree[pos].lazy = 0;                           // default lazy
+            tree[pos].lazy = inf;                           // default lazy
         }
     }
     void pull(int pos){
@@ -154,7 +149,50 @@ void prep(){
 }
 
 ll n, m, x, y, z, q, k, u, v, w;
-vll ty(N), h(N); 
+int a[N], b[N]; 
+vector<int> gr[N];
+int cnt[N], in[N], out[N], nxt[N]; // cant name next :(
+int dep[N], par[N];
+int timer = -1;
+
+// HLD starts
+void dfs_sz(int node, int p) {
+    par[node] = p;
+    if(node!=1) dep[node] = dep[p] + 1;
+    cnt[node] = 1;
+    int mxch_id = -1;
+    L(i, 0, sz(gr[node])-1) {
+        int ch = gr[node][i];
+        if(ch==p) continue;
+        dfs_sz(ch, node);
+        cnt[node] += cnt[ch];
+        if(mxch_id==-1 or cnt[ch] > cnt[gr[node][mxch_id]]) mxch_id = i;
+    }
+    if(mxch_id!=-1) swap(gr[node][mxch_id], gr[node][0]);
+}
+
+void dfs_hld(int node) {
+    in[node] = ++timer;
+    for(auto ch: gr[node]) {
+        if(ch==par[node]) continue;
+        nxt[ch] = (ch == gr[node][0] ? nxt[node] : ch);
+        dfs_hld(ch);
+    }
+    out[node] = timer;
+}
+
+ll path(ll u, ll v, Seg &seg) {
+    ll ans = 0;
+    while(nxt[u] != nxt[v]) {
+        if(dep[nxt[u]] < dep[nxt[v]]) swap(u, v);
+        ans = max(ans, seg.query(in[nxt[u]], in[u]).mx ); // top of u's heavy chain to u
+        u = par[nxt[u]];
+    }
+    if(dep[u] > dep[v]) swap(u, v);
+    ans = max(ans, seg.query(in[u], in[v]).mx);
+    return ans;
+}
+// HLD ends
 
 void solve(){
     
@@ -162,50 +200,31 @@ void solve(){
 
     // cleanup ?
 
-    int t; cin >> t;
-    for(int tcase = 1; tcase <= t; tcase++) {
-        cin >> n;
-        L(i, 0 ,n-1) cin >> ty[i] >> h[i];
-
-        vll helper(n), dp(n); // for j<i, helper[j] = dp[j-1] + max[j ... i]
-                                // i.e. if [j...i] is the last segment, what is the min cost
-        Seg seg(helper);
-
-        vll last_pos(N, -1), leftmost(N, -1); 
-        leftmost[0] = 0; last_pos[ty[0]] = 0;
-        L(i, 1, n-1) {
-            leftmost[i] = max(last_pos[ty[i]] + 1, leftmost[i-1]);
-            last_pos[ty[i]] = i;
-            deb(leftmost[i]);
-        }
-
-        stack<pll> stk; // {start_of_mx_range, mx}
-        L(i, 0, n-1) {
-            ll tem = i-1; // last position whose +mx part of helper is to be updated. [might stay at i-1]
-            while(stk.size() and stk.top().S < h[i]) {
-                seg.modify(stk.top().F, tem, -stk.top().S);
-                tem = stk.top().F - 1;
-                stk.pop();
-            }
-            if(tem != i-1) seg.modify(tem+1, i-1, h[i]);
-
-            // considering separate
-            dp[i] = (i==0 ? 0 : dp[i-1]) + h[i]; 
-
-            // considering joining
-            if(i>0 and ty[i] != ty[i-1]) {
-                ll from = leftmost[i];
-                ll to = i-1;
-                dp[i] = min(dp[i], seg.query(from, to).mn);
-            }
-
-            if(i) seg.modify(i, i, dp[i-1] + h[i]);
-            else seg.modify(i, i, h[i]); // nothing before, so 0
-            stk.push({tem+1, h[i]});
-        }
-        deb(dp);
-        cout << "Case " << tcase << ": " <<  dp[n-1] << nl; // 0 based
+    cin >> n >> q;
+    L(i, 1, n) cin >> b[i];
+    L(i, 1, n-1) {
+        cin >> u >> v;
+        gr[u].push_back(v);
+        gr[v].push_back(u);
     }
+    dep[1] = 0;
+    dfs_sz(1, 1); // SETTING PARENT OF 1 TO 1
+    dfs_hld(1);
+    // id 0 based, nodes 1 based, no worry :)
+    vector<int> a(n); 
+    L(i, 1, n) a[in[i]] = b[i]; 
+    Seg seg(a); deb(seg.query(0, 0).mx);
+    while(q--) {
+        int t; cin >> t;
+        if(t==1) {
+            int node, val; cin >> node >> val;
+            seg.modify(in[node], in[node], val);
+        } else {
+            cin >> u >> v;
+            cout << path(u, v, seg) << gp;
+        }
+    }
+
 }
 
 int main() {

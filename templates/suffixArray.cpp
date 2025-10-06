@@ -55,6 +55,27 @@ const int mod = 1e9 + 7;
 const int N = 1000005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
+/*
+    gives suffixed in lexicographically increasing order
+    sa[0] = length. indicates empty suffix. ignore it
+    sa[1] to sa[n] : lexicographically 1st to n-th
+    sa[1] = index of lexicographically 1st suffix. 0 BASED INDEX !!!
+    lcp[1] = lcp of sa[1] and sa[2] 
+    so, lcp[0] = 0. ignore
+
+    why suffix array?
+    it gives me the suffixes in lex order
+    and, any sustring is a prefix of a suffix
+    so essentially i get substrings in lex order, if i iterate over suffix array, and for each suffix, iterate over prefixes
+    
+    why lcp?
+    helps ignore repitions / count repitions
+
+    distinct substrings = n*(n+1)/2 - sum(all(lcp))
+    pattern search = bin. search on sa
+    longest repeated substring = max(lcp)
+*/
+
 vll build_suffix_array(const string &ins) {
     string s = ins + '#';
     int n = s.size();
@@ -98,7 +119,6 @@ vll build_suffix_array(const string &ins) {
     }
     return p;
 }
-
 vll build_lcp(const string &ins, vll &sa) {
     string s = ins + '#';
     int n = s.size();
