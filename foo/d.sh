@@ -1,4 +1,4 @@
-#!/bin/bash
+# !/bin/bash
 
 # Check if input file argument is provided
 if [ $# -lt 1 ]; then
