@@ -1,5 +1,5 @@
 @echo off
-set SRC=a.cpp
+set SRC=z.cpp
 set EXE=a
 
 :: Compile

@@ -68,13 +68,13 @@ void solve(){
 
     // cleanup ?
 
-    
+    cout << "hello" << nl;
 
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    // int t; cin >> t; while(t--)
+    int t; cin >> t; while(t--)
     solve();
 }
