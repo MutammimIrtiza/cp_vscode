@@ -69,6 +69,9 @@ void solve(){
     // cleanup ?
 
     cout << "hello" << nl;
+    vector<ar<ll,3>> v;
+    v.push_back({2,3,4});
+    deb(v);
 
 }
 
