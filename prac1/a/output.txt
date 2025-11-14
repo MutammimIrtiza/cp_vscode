@@ -1,0 +1,11 @@
+
+Input: 
+5
+blue
+red
+blue
+black
+red
+Output: 
+3
+

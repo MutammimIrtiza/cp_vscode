@@ -180,31 +180,32 @@ void solve(){
         }
 
         stack<pll> stk; // {END_of_mx_range, mx}
-        
-        L(i, 0, n-1) {
 
-            // considering separate
-            dp[i] = (i==0 ? 0 : dp[i-1]) + h[i];
+        L(i, 0, n-1) {
 
             // make necessary changes in range 0...(i-1)
             if(i) {
-                ll kotha_theke_change_shuru = inf; 
+                ll kotha_theke_change_shuru = i-1;
                 while(stk.size() and stk.top().S < h[i]) {
-                    auto [rangeEnd, prevmx] = stk.top();
+                    ll rangeEnd = stk.top().F;
+                    ll prevmx = stk.top().S;
                     stk.pop();
 
                     ll rangeStart = stk.empty() ? 0 : (stk.top().F + 1);
 
                     seg.modify(rangeStart, rangeEnd, -prevmx);
-                    kotha_theke_change_shuru = rangeStart;
+                    kotha_theke_change_shuru= rangeStart;
                 }
-                if(kotha_theke_change_shuru != inf) {
-                    seg.modify(kotha_theke_change_shuru, i-1, h[i]);
-                    stk.push({i-1, h[i]});
-                } 
+                seg.modify(kotha_theke_change_shuru, i-1, h[i]);
+                stk.push({i-1, h[i]});
             }
 
-            // now considering joining
+            // now find dp[i]
+
+            // considering separate
+            dp[i] = (i==0 ? 0 : dp[i-1]) + h[i];
+
+            // considering joining
             if(i>0 and ty[i] != ty[i-1]) {
                 ll from = leftmost[i];
                 ll to = i-1;

@@ -71,12 +71,12 @@ struct Trie {
     static const char BASE = 'a';
     struct Node {
         int next[ALPHABET];
-        bool is_end;
-        int count;
+        int ends_here_cnt;
+        int count; // passes this node
 
         Node() {
             fill(next, next + ALPHABET, -1);
-            is_end = false;
+            ends_here_cnt = 0;
             count = 0;
         }
     };
@@ -98,24 +98,37 @@ struct Trie {
             cur = nodes[cur].next[c];
             nodes[cur].count++;
         }
-        nodes[cur].is_end = true;
+        nodes[cur].ends_here_cnt++;
+    }
+
+    bool erase(const string &s) {
+        if (!search(s)) return false;
+        
+        int cur = 0;
+        for (char ch : s) {
+            int c = ch - BASE;
+            cur = nodes[cur].next[c];
+            nodes[cur].count--;  
+        }
+        nodes[cur].ends_here_cnt--;
+        return true;
     }
 
     bool search(const string &s) const {
         int cur = 0;
         for (char ch : s) {
             int c = ch - BASE;
-            if (nodes[cur].next[c] == -1) return false;
+            if (nodes[cur].next[c] == -1 || nodes[nodes[cur].next[c]].count == 0) return false;
             cur = nodes[cur].next[c];
         }
-        return nodes[cur].is_end;
+        return nodes[cur].ends_here_cnt > 0;
     }
 
     bool starts_with(const string &prefix) const {
         int cur = 0;
         for (char ch : prefix) {
             int c = ch - BASE;
-            if (nodes[cur].next[c] == -1) return false;
+            if (nodes[cur].next[c] == -1 || nodes[nodes[cur].next[c]].count == 0) return false;
             cur = nodes[cur].next[c];
         }
         return true;
@@ -125,7 +138,7 @@ struct Trie {
         int cur = 0;
         for (char ch : prefix) {
             int c = ch - BASE;
-            if (nodes[cur].next[c] == -1) return 0;
+            if (nodes[cur].next[c] == -1 || nodes[nodes[cur].next[c]].count == 0) return 0;
             cur = nodes[cur].next[c];
         }
         return nodes[cur].count;
@@ -137,7 +150,7 @@ struct Trie {
         int ans = 0;
         for (char ch : s) {
             int c = ch - BASE;
-            if (nodes[cur].next[c] == -1) break;
+            if (nodes[cur].next[c] == -1 || nodes[nodes[cur].next[c]].count == 0) break;
             cur = nodes[cur].next[c];
             ans += nodes[cur].count;
         }

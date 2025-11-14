@@ -29,7 +29,7 @@
 
 
 struct DisjointSet {
-    vll par, sz; ll c; vll exp;
+    vll par, sz; ll c; vll exp; // no extra "joma" variable
 
     DisjointSet(ll n){
         sz.resize(n+1, 0LL); par.resize(n+1,0LL); c = n; exp.resize(n+1, 0LL);
@@ -55,7 +55,7 @@ struct DisjointSet {
         // do stuff here if needed
         // passing down is not needed for node just below root, coz connection stays
         // else, connection will be gone due to path compression
-        // so we push down exp[par[node]] 
+        // so we push down exp[par[node]]
         // NOT exp[x]. careful
         // also, this par[node] is never going to store anything in future, so its ok
         // bye bye par[node]. x is the new par. you have done your job and passed down :)
