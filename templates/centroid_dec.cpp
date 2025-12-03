@@ -1,5 +1,3 @@
-// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
-
 #include<bits/stdc++.h>
 using namespace std;
 
@@ -28,6 +26,7 @@ using namespace __gnu_pbds;
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
+#define extract(m, x) { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); } // set, multiset, map
 #define gp " "
 #define nl "\n"
 #define yes cout<<"YES"<<nl
@@ -51,19 +50,12 @@ using namespace __gnu_pbds;
 
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
-const lld pi = 2*acos(0.0);
 const int mod = 1e9 + 7;
 const int N = 200005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
-void prep(){
-    
-}
-
+    // CENTROID starts
 ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), b(N); 
-
-// start
 vector<int> gr[N];
 int sz[N];
 int tot, done[N], cenpar[N];
@@ -94,90 +86,112 @@ void decompose(int node, int p) { // find centroid of subtree of node, and assig
     decompose(ch, cen);
   }
 }
-vll cen_gr[N]; // cen. decom. tree
-int form_cen_gr() { // form graph, return root(centroid)
+vll cen_tree[N]; // centroid tree
+int form_cen_tree() { // form graph, return root(centroid)
     decompose(1, 0);
     int root;
     L(i, 1, n) {
         if(cenpar[i] == 0) root = i;
-        cen_gr[i].push_back(cenpar[i]);
-        cen_gr[cenpar[i]].push_back(i);
+        if(cenpar[i] != 0) {
+            cen_tree[i].push_back(cenpar[i]);
+            cen_tree[cenpar[i]].push_back(i);
+        }
     }
     return root;
 }
-// end
+    // CENTROID ends
 
-
-
-ll ans = 0;
-bool niyechi[N]; // for cengr
-int cnt[N] = {1}; // cnt[0] = 1, rest 0
-int mxdep = 0;
-void dfs(int node, int par, int dep, vector<int> &depths_in_subtree) { 
-    if(dep>k) return;
-    mxdep = max(mxdep, dep);
-    ans += cnt[k-dep];
-    depths_in_subtree.push_back(dep);
-    for(int ch : gr[node]) {
-        if(ch==par or niyechi[ch]) continue; // both needed !!!
-        dfs(ch, node, dep+1, depths_in_subtree);
-    }
+void prep(){
+    
 }
-void guno(ll node) { // on original graph ofc.
-    for(int ch : gr[node]) {
-        if(niyechi[ch]) continue;
-        // update ans first, then cnt array
-        vector<int> dephts_in_subtree;
-        dfs(ch, node, 1, dephts_in_subtree); // combine with previous subtrees
-        for(int d : dephts_in_subtree) cnt[d]++; // from now on its a "previous subtree", so update
-    }
-}
-void dfs_on_cengr(int node) {
-    niyechi[node] = 1;
-    guno(node);
-    L(i, 1, mxdep) cnt[i] = 0; mxdep = 0; // cleanup of guno call. IMPORTANT. CANT DO UPTO n
-    for(int ch : cen_gr[node]) {
-        if(niyechi[ch]) continue;
-        dfs_on_cengr(ch);
+
+bool dead[N];
+vector<ar<ll,2>> wgr[N];
+vll best(1000006, inf);
+ll ans;
+vll tem;
+
+void dfs2(ll node, ll par, ll len, ll cnt) { // on main graph ofc
+    if(len > k) return;  // ********** TLE ISSUE
+    best[len] = min(best[len], cnt), tem.push_back(len);
+
+    for(auto [ch, w] : wgr[node]) {
+        if(ch==par || dead[ch]) continue;
+        dfs2(ch, node, len+w, cnt+1);
     }
 }
 
+void dfs1(ll node, ll par, ll len, ll cnt) { // on main graph ofc
+    if(len > k) return;  // ********** TLE ISSUE
+    if(best[k - len] != inf) ans = min(ans, best[k - len] + cnt), deb(best[k - len]);
 
-void solve(){ 
+    for(auto [ch, w] : wgr[node]) {
+        if(ch==par || dead[ch]) continue;
+        dfs1(ch, node, len+w, cnt+1);
+    }
+}
+
+void run(int peak) {
+    best[0] = 0;  // ****************** WA ISSUE
+    dead[peak] = 1; 
+    for(ll x : tem) best[x] = inf;
+    tem.clear();  // ****************** WA ISSUE
+
+    for(auto [ch, w] : wgr[peak]) {
+        if(ch and !dead[ch]) {
+            dfs1(ch, peak, w, 1);
+            dfs2(ch, peak, w, 1);
+        }
+    }
+
+    for(auto ch : cen_tree[peak]) {
+        if(ch and !dead[ch]) run(ch);
+    }
+}
+
+
+
+int best_path(int N, int K, int H[][2], int L[]) {
+    /*
+        consider all paths with a node as "peak".
+        then consider it dead.
+        repeat.
+
+        centroid tree gives good complexity for the process.
+
+        [time can be improved slightly by avoiding dfs2 and instead pushing lengths in some vector during dfs1]
+    */
+
+    n = N; k = K;
+    L(i, 1, n-1) {
+        u = H[i-1][0]; v = H[i-1][1]; u++; v++; w = L[i-1];
+        wgr[u].push_back({v, w}); wgr[v].push_back({u, w});
+        gr[u].push_back(v); gr[v].push_back(u);
+    }
+    int cen = form_cen_tree();
+    ans = inf;
+    run(cen);
+    return (ans==inf) ? -1 : ans;
+}
+
+
+void solve(int tcase){
     
     // testcases ?
 
     // cleanup ?
 
-    /*
-        when we want to form all pairs of 1,2,3,4,5 what do we do?
-        1 + 2/3/4/5
-        2 + 3/4/5
-        ...
-        ...
-        we do the same here.
-        count all paths of length k containing some node.
-        then ignore it in all next turns.
-        but in what order do we fix nodes?
-        centroid decomp here gives us an efficient order.
-        we CAN form the tree, but its not necessary
-    */
-
-    https://cses.fi/problemset/task/2080/
     cin >> n >> k;
-    L(i, 1, n-1) {
-        cin >> u >> v;
-        gr[u].push_back(v);
-        gr[v].push_back(u);
+    int H[n-1][2]; int L[n-1];
+    L(i, 0, n-2) {
+        cin >> u >> v >> w; H[i][0] = u, H[i][1] = v, L[i] = w;
     }
-    int cen = form_cen_gr();
-    dfs_on_cengr(cen);
-    cout << ans << nl;
+    cout << best_path(n,k,H,L) << nl;
 }
-
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    // int t; cin >> t; while(t--)
-    solve();
+    int tcase = 1;
+    // int t; cin >> t; for(; tcase <= t; ++tcase)
+    solve(tcase);
 }

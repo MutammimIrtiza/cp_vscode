@@ -155,7 +155,7 @@ int cnt[N], in[N], out[N], nxt[N]; // cant name next :(
 int dep[N], par[N];
 int timer = -1;
 
-// HLD starts
+    // HLD starts
 void dfs_sz(int node, int p) {
     par[node] = p;
     if(node!=1) dep[node] = dep[p] + 1;
@@ -192,7 +192,7 @@ ll path(ll u, ll v, Seg &seg) {
     ans = max(ans, seg.query(in[u], in[v]).mx);
     return ans;
 }
-// HLD ends
+    // HLD ends
 
 void solve(){
     

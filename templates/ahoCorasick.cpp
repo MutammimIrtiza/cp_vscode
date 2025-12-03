@@ -149,7 +149,7 @@ ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
 void solve(){ // https://cses.fi/problemset/result/14686177/
-    
+
     // testcases ?
 
     // cleanup ?

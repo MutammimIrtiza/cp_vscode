@@ -181,9 +181,7 @@ void solve(){
             seg.modify(in[node], in[node], val);
         } else {
             ll node; cin >> node;
-            ll prefr = seg.query(0, out[node]).sum;
-            ll prefl = in[node] == 0 ? 0 : seg.query(0, in[node]-1).sum;
-            cout << prefr-prefl << nl;
+            cout << seg.query(in[node], out[node]).sum << nl;
         }
     }
 

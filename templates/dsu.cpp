@@ -49,7 +49,7 @@ struct DisjointSet {
         ll x = findUlt(par[node]);
 
         // do stuff here if needed
-
+        if(par[node]!=x) {  }
 
         par[node] = x; // path compression. remove ???
 
@@ -60,7 +60,8 @@ struct DisjointSet {
         ll ulpu = findUlt(u); ll ulpv = findUlt(v);
         if(ulpu == ulpv) return;
         --c;
-        if(sz[ulpu] < sz[ulpv]) swap(ulpu, ulpv);
+        // union by size.   COMMENT THIS OUT IF YOU NEED TO MAINTAIN DIRECTION 
+        if(sz[ulpu] < sz[ulpv]) swap(ulpu, ulpv); 
 
         par[ulpv] = ulpu;
         sz[ulpu] += sz[ulpv]; 

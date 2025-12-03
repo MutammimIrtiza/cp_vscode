@@ -51,7 +51,6 @@ using namespace __gnu_pbds;
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
-const int N = ; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 void prep(){
@@ -60,13 +59,62 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 
+const int N = 1<<20; 
+vll cnt(N);
+vll dp1(N);
+vll dp2(N);
+
+void fwd1(vll &dp) { // dp[x] = cnt of submask of x
+    L(bit,0,19) {
+        L(mask,0,N-1) {
+            if(getBit(mask,bit)) dp[mask] += dp[resetbit(mask,bit)];
+        }
+    }
+}
+
+void bak1(vll &dp) {  // return from submask count to mask count
+    R(bit,19,0) {
+        R(mask,N-1,0) {
+            if(getBit(mask,bit)) dp[mask] -= dp[resetbit(mask,bit)];
+        }
+    }
+}
+
+void fwd2(vll &dp) { // dp[x] = cnt of supermask of x
+    L(bit,0,19) {
+        R(mask,N-1,0){
+            if(getBit(mask,bit)) dp[resetbit(mask,bit)] += dp[mask];
+        }
+    }
+}
+
+void bak2(vll &dp) {  // return from supermask count to mask count
+    R(bit,19,0) {
+        L(mask,0,N-1) {
+            if(getBit(mask,bit)) dp[resetbit(mask,bit)] -= dp[mask];
+        }
+    }
+}
+
 void solve(int tcase){
     
     // testcases ?
 
     // cleanup ?
 
-    
+    /*
+        for problems like sum/count involving submaks/supermask, we use sos dp to avoid overcounting.
+        x|y = x  :  y is submask of x
+        x&y = x  :  y is supermask of x
+        x&y = 0  :  y is submask of ~x
+    */
+
+    cin >> n; vll a(n+1);
+    L(i, 1, n) cin >> a[i], cnt[a[i]]++;
+    L(i, 0, N-1) dp1[i] = cnt[i], dp2[i] = cnt[i];
+    fwd1(dp1);
+    fwd2(dp2);
+    L(i, 1, n) cout << dp1[a[i]] << gp << dp2[a[i]] << gp << (n - dp1[a[i]^(N-1)]) << nl;
 
 }
 
@@ -74,6 +122,6 @@ int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
-    int t; cin >> t; for(; tcase <= t; ++tcase)
+    // int t; cin >> t; for(; tcase <= t; ++tcase)
     solve(tcase);
 }

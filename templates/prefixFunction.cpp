@@ -99,8 +99,7 @@ mint power(mint a, int64_t n) {
     return res;
 }
 
-// 0 based !!!
-// for each position of s, what is the best match of a suffix at that position with a prefix of s
+// for each position (0 based ***) of s, what is the best match of a suffix at that position with a prefix of s
 vector<int> prefixFunction(const string &s) { 
     int n = s.size();
     vector<int> pi(n);

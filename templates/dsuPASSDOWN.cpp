@@ -71,6 +71,7 @@ struct DisjointSet {
         ll ulpu = findUlt(u); ll ulpv = findUlt(v);
         if(ulpu == ulpv) return;
         --c;
+        // union by size.   COMMENT THIS OUT IF YOU NEED TO MAINTAIN DIRECTION 
         if(sz[ulpu] < sz[ulpv]) swap(ulpu, ulpv);
 
         par[ulpv] = ulpu;

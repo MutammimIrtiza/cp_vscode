@@ -59,51 +59,64 @@ void prep(){
     
 }
 
+
+    // LCA starts
 ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), b(N); 
-
 vll gr[N];
-vvll lift(N, vll(20)); // binary lifting
-vll depth(N); // needed for distance calculation. dist(u, v) = depth[u] + depth[v] - 2*depth[find_lca(u, v)]
+vll depth(N), first(N);
 vll in_time(N), out_time(N);
+vector<ll> tour;    
+vector<vll> st; // Sparse Table for RMQ
+ll logn; 
 ll timer = 0;
-namespace LCA {
-    void lca_dfs(ll node, ll par, ll dep) {
-        in_time[node] = ++timer;
-        depth[node] = dep;
-        lift[node][0] = par;
-        for(int j = 1; j < 20; ++j) {
-            if(lift[node][j-1] == -1) lift[node][j] = -1;
-            else lift[node][j] = lift[ lift[node][j-1] ][j-1]; 
+
+// Build sparse table : st[j][i] = node with min depth among first 2^j nodes in tour starting from i
+void build_st() {
+    logn = __lg(tour.size()) + 1;
+    st.assign(logn, vll(tour.size()));
+    st[0] = tour; // store node ids
+    for (ll j = 1; j < logn; ++j) {
+        for (ll i = 0; i + (1<<j) <= (ll)tour.size(); ++i) {
+            ll a = st[j-1][i];  ll b = st[j-1][i + (1<<(j-1))];
+            st[j][i] = (depth[a] < depth[b]) ? a : b;
         }
-        for(ll ch : gr[node]) {
-            if(ch == par) continue;
-            lca_dfs(ch, node, dep+1);
-        }
-        out_time[node] = ++timer;
-    }
-
-    // is u ancestor of v ?
-    bool is_ancestor(ll u, ll v) {return in_time[u] < in_time[v] and out_time[u] > out_time[v];}
-
-    ll find_lca(ll u, ll v) {
-        if(u == v) return u;
-        if(is_ancestor(u, v)) return u;
-        if(is_ancestor(v, u)) return v;
-
-        for(ll i = 19; i >= 0; --i) {
-            if(lift[u][i] != -1 and !is_ancestor(lift[u][i], v)) {
-                u = lift[u][i];
-            }
-        }
-        return lift[u][0];
-    }
-
-    void prep_lca(ll root) {
-        timer = 0;
-        lca_dfs(root, -1, 0); 
     }
 }
+
+void lca_dfs(ll node, ll par, ll dep) {
+    in_time[node] = ++timer;
+    depth[node] = dep;
+    first[node] = tour.size();
+    tour.push_back(node);
+    for(ll ch : gr[node]) {
+        if(ch == par) continue;
+        lca_dfs(ch, node, dep + 1);
+        tour.push_back(node);  
+    }
+    out_time[node] = ++timer;
+}
+
+void prep_lca(ll root = 1) {
+    tour.clear(); tour.reserve(n*2-1);
+    lca_dfs(root, -1, 0);
+    build_st();
+}
+
+ll find_lca(ll u, ll v) {
+    ll l = first[u], r = first[v]; 
+    if(l > r) swap(l, r);
+    ll j = __lg(r - l + 1);
+    ll a = st[j][l];    ll b = st[j][r - (1<<j) + 1];
+    return (depth[a] < depth[b]) ? a : b;
+}
+
+// is u ancestor of v ?
+bool is_ancestor(ll u, ll v) {return in_time[u] < in_time[v] and out_time[u] > out_time[v];}
+
+ll distance(ll u, ll v) {
+    return depth[u] + depth[v] - 2*depth[find_lca(u, v)];
+}
+    // LCA ends
 
 
 void solve(){
@@ -118,10 +131,10 @@ void solve(){
         gr[u].push_back(v);
         gr[v].push_back(u);
     }
-    LCA::prep_lca(1);
+    prep_lca(1);
     while(q--) {
         cin >> u >> v;
-        ll lca = LCA::find_lca(u, v);
+        ll lca = find_lca(u, v);
         cout << depth[u] + depth[v] - 2*depth[lca] << nl;
     }
 

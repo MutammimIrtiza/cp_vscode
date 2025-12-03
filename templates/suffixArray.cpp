@@ -1,5 +1,3 @@
-// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
-
 #include<bits/stdc++.h>
 using namespace std;
 
@@ -18,6 +16,7 @@ using namespace __gnu_pbds;
 #define pll pair<long long, long long>
 #define vvll vector<vll>
 #define vvvll vector<vvll>
+#define vi vector<int>
 #define ar array
 #define F first
 #define S second
@@ -28,10 +27,11 @@ using namespace __gnu_pbds;
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
+#define extract(m, x) { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); } // set, multiset, map
 #define gp " "
 #define nl "\n"
-#define yes cout<<"YES"<<nl
-#define no cout<<"NO"<<nl
+#define yes cout<<"Yes"<<nl
+#define no cout<<"No"<<nl
 
 #define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
@@ -52,14 +52,16 @@ using namespace __gnu_pbds;
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
-const int N = 1000005; ///////////////////////////////////////
+const int N = 300005; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
+
 /*
-    gives suffixed in lexicographically increasing order
+    0 BASED STRING ***
+    gives suffixes in lexicographically increasing order
     sa[0] = length. indicates empty suffix. ignore it
-    sa[1] to sa[n] : lexicographically 1st to n-th
-    sa[1] = index of lexicographically 1st suffix. 0 BASED INDEX !!!
+    sa[1] to sa[n] : lexicographically 1st to n-th (indices from 0 to n-1)
+    sa[1] = index of lexicographically 1st suffix. 0 BASED INDEX ***
     lcp[1] = lcp of sa[1] and sa[2] 
     so, lcp[0] = 0. ignore
 
@@ -71,15 +73,15 @@ const ll inf = 1e15; /////////////////////////////////////////////
     why lcp?
     helps ignore repitions / count repitions
 
-    distinct substrings = n*(n+1)/2 - sum(all(lcp))
+    distinct substrings = n*(n+1)/2 - sum(all(lcp))     [not lcp*(lcp+1)/2 ***]
     pattern search = bin. search on sa
     longest repeated substring = max(lcp)
 */
 
-vll build_suffix_array(const string &ins) {
+vi build_suffix_array(const string &ins) {
     string s = ins + '#';
     int n = s.size();
-    vll p(n), c(n); // position, class
+    vi p(n), c(n); // position, class
     vector<pair<char, int>> a(n);
     L(i, 0, n-1) a[i] = {s[i], i};
     sort(all(a));
@@ -92,7 +94,7 @@ vll build_suffix_array(const string &ins) {
         for(auto x : c) {
             cnt[x]++;
         }
-        vll p_new(n);
+        vi p_new(n);
         vector<int> pos(n);
         L(i, 1, n-1) pos[i] = pos[i-1] + cnt[i-1]; // starting position of buckets
         for(auto x : p) {
@@ -107,7 +109,7 @@ vll build_suffix_array(const string &ins) {
         // k -> k+1
         L(i, 0, n-1) p[i] = (p[i] - (1<<k) + n) % n;
         count_sort();
-        vll c_new(n);
+        vi c_new(n);
         c_new[p[0]] = 0;
         L(i, 1, n-1) {
             pll now = {c[p[i]], c[(p[i] + (1<<k)) %n]};
@@ -119,7 +121,7 @@ vll build_suffix_array(const string &ins) {
     }
     return p;
 }
-vll build_lcp(const string &ins, vll &sa) {
+vll build_lcp(const string &ins, vi &sa) {
     string s = ins + '#';
     int n = s.size();
     vll lcp(n-1), rnk(n);
@@ -135,36 +137,67 @@ vll build_lcp(const string &ins, vll &sa) {
 }
 
 void prep(){
-    
+
 }
 
-ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), c(N); 
 
-void solve(){ // number of distinct substrings of s. TLE :(
+
+
+
+
+ll n, m, x, y, z, q, k, u, v, w;
+
+void solve(int tcase){ // https://codeforces.com/edu/course/2/lesson/2/3/practice/contest/269118/problem/B
     
     // testcases ?
 
     // cleanup ?
 
     string s; cin >> s;
+    vi sa = build_suffix_array(s);
+
     cin >> q;
     while(q--) {
-        ll l, r; cin >> l >> r; l--, r--;
-        string now = s.substr(l, r-l+1);
-        vll sa = build_suffix_array(now);
-        vll lcp = build_lcp(now, sa); // 9
-        ll nn = r-l+1; // 9 10
-        ll ans = nn*(nn+1)/2;
-        for(auto x : lcp) ans -= x;
-        cout << ans << nl;
+        string t; cin >> t;
+
+        // first ( >= t ) [0 0 0 1 1 1 1 1]
+        ll lo = 1;
+        ll hi = sz(s);
+        ll first = -1;
+        while(lo <= hi) {
+            ll mid = lo+hi>>1;
+            string plz = s.substr(sa[mid], sz(t)); 
+            if(plz >= t) {
+                first = mid; hi = mid-1;
+            } else lo = mid+1;
+        }
+
+
+        if(first == -1 || s.substr(sa[first], sz(t)) != t) {cout << 0 << nl; continue;}
+
+
+        // last ( <= t ) [1 1 1 1 0 0 0 0]
+        lo = 1;
+        hi = sz(s);
+        ll last = -1;
+        while(lo <= hi) {
+            ll mid = lo+hi>>1;
+            string plz = s.substr(sa[mid], sz(t));
+            if(plz <= t) {
+                last = mid; lo = mid+1;
+            } else hi = mid-1;
+        }
+
+        cout << last-first+1 << nl;
+
     }
 
-}   
+}
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
-    solve();
+    int tcase = 1;
+    // int t; cin >> t; for(; tcase <= t; ++tcase)
+    solve(tcase);
 }

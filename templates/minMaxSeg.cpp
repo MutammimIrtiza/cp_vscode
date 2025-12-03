@@ -58,12 +58,11 @@ const ll inf = 1e15; /////////////////////////////////////////////
 
 // query : min max sum
 // update : range addition
-// LAZY HAS TO BE 0 FOR RANGE ADDITION. NOT INF
 struct Seg{
     struct node{
         ll mn = inf;
         ll mx = -inf;
-        ll lazy = 0;
+        ll lazy = 0; // USE INF FOR RANGE ASSIGNMENT *****
         ll sum = 0;
  
         node() {}
@@ -104,11 +103,11 @@ struct Seg{
     }
     void push(int pos, int l, int r){
         if(l == r) return;
-        if (tree[pos].lazy != 0) {  
+        if (tree[pos].lazy != 0) {                          // default lazy
             int mid = (l + r) / 2;
             tree[2*pos].apply(l, mid, tree[pos].lazy);
             tree[2*pos+1].apply(mid+1, r, tree[pos].lazy);
-            tree[pos].lazy = 0;                           // default lazy
+            tree[pos].lazy = 0;                             // default lazy
         }
     }
     void pull(int pos){
@@ -137,6 +136,7 @@ struct Seg{
         modify(1, 0, size-1, ql, qr, y); 
     }
     void modify(int pos, int l, int r, int ql, int qr, ll y){
+        if(ql > r || qr < l) return;
         push(pos, l, r);
         if (l >= ql && r <= qr){
             tree[pos].apply(l, r, y);

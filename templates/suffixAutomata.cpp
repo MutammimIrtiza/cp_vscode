@@ -61,6 +61,7 @@ const ll inf = 1e15; /////////////////////////////////////////////
     There can be multiple paths leading to a state
     The state corresponds to strings formed by those paths
     starting from the initial state, EVERY SUBSTRING can be formed.
+    also, start from ANY state, follow transitions, whay you get is a substring.
 
     ...cab...cab...cab...
     endpos_set(string p) = set of all positions in main string where p ends, i.e. p is a suffix if we cut the string there...
@@ -69,14 +70,14 @@ const ll inf = 1e15; /////////////////////////////////////////////
     their lengths form a certain interval [x:y]
     the first few suffixes (decreasing length) of the biggest are included here
     they are together called an equivalence class
-    the remaining smaller suffixed occur in more places, so they are in some other state
+    the remaining smaller suffixes occur in more places, so they are in some other state
     
     ...cab...cab...cab...jab...jab
     if string p1 is a suffix of p2, and occurs in more positions than p2, then obviously they are in different states
     in this case, endpos_set(p2) is a subset of endpos_set(p1)
     
     suffix link of current state leads to the state having the longest suffix that is absent here
-    suffix links form a tree 
+    suffix links form a tree
     minlen(state) = maxlen(link(state)) + 1
 
     what does a transition mean in suffix automaton?
@@ -90,20 +91,25 @@ const ll inf = 1e15; /////////////////////////////////////////////
 
     number of different substrings = for all states (1 to sz(st)-1), sum maxlen[i] - maxlen[link[i]]
 
-    start from ANY state, follow transitions, whay you get is a substring.
+    counting repititions for each node <after processing whole string> :
+        build tree [edges in reverse direction of suffix link]
+        repitition of strings in a node = sum of reps. of children
+        base case : 1 for was_terminal states
+
 */
 struct SAM {
     struct State {
-        int link, len;
+        int link, maxlen;
         map<char,int> next;  
-        State() { link = -1; len = 0; }
+        State() { link = -1; maxlen = 0; }
     };
     vector<State> st;
+    vector<vector<int>> gr; vector<ll> koybar; vector<bool> was_terminal;
     int last, sz;
     long long total; // number of unique substrings
 
-    SAM(int maxlen) {
-        st.resize(2*maxlen);
+    SAM(int n) {
+        st.resize(2*n); gr.resize(2*n); koybar.resize(2*n); was_terminal.resize(2*n);
         st[0] = State();
         sz = 1;
         last = 0;
@@ -112,7 +118,7 @@ struct SAM {
 
     void extend(char c) {
         int cur = sz++;
-        st[cur].len = st[last].len + 1;
+        st[cur].maxlen = st[last].maxlen + 1;
         int p = last;
         while (p != -1 && !st[p].next.count(c)) { 
             st[p].next[c] = cur;
@@ -122,12 +128,12 @@ struct SAM {
             st[cur].link = 0;
         } else {
             int q = st[p].next[c];
-            if (st[p].len + 1 == st[q].len) {
+            if (st[p].maxlen + 1 == st[q].maxlen) {
                 st[cur].link = q;
             } else {
                 int clone = sz++;
                 st[clone] = st[q]; 
-                st[clone].len = st[p].len + 1;
+                st[clone].maxlen = st[p].maxlen + 1;
                 while (p != -1 && st[p].next[c] == q) {
                     st[p].next[c] = clone;
                     p = st[p].link;
@@ -135,11 +141,28 @@ struct SAM {
                 st[q].link = st[cur].link = clone;
             }
         }
-        last = cur;
-        total += st[cur].len - st[st[cur].link].len;
+        last = cur; was_terminal[last] = true;
+        total += st[cur].maxlen - st[st[cur].link].maxlen;
     }
 
-    // after adding the entire string, if you need to mark terminal states, do the following:
+    void build_tree() {     // USE (sam.sz-1) when you need to visit all states. DO NOT USE sz(sam.st) ***
+        L(i, 1, sz-1) gr[st[i].link].push_back(i);
+    }
+    
+    void guno() {       // count repetitions in the string for each node < after building tree *** >
+        int cur = last;
+        L(i, 1, sz-1) koybar[i] = was_terminal[i];
+        function<void(int)> dfs = [&](int node) {
+            for(int ch : gr[node]) {
+                dfs(ch); koybar[node] += koybar[ch];
+            }
+        };
+        dfs(0);
+    }
+
+    ll koyta(int i) {return st[i].maxlen - st[st[i].link].maxlen;}
+
+    // after adding the entire string, if you need terminal states, do the following:
     // start from last, go back by suffix links. all the visited states are terminal states
 };
 
@@ -151,36 +174,32 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 
-void solve(){
+void solve(){ 
     
     // testcases ?
 
     // cleanup ?
 
     string s; cin >> s;
-    n = s.size();
-    vvll ans(n+1, vll(n+1, 0));
+    SAM sam(sz(s));
+    for(char c : s) sam.extend(c);
 
-    L(l, 0, n-1) {
-        SAM sam(n-l);
-        L(r, l, n-1) {
-            sam.extend(s[r]);
-            ans[l][r] = sam.total;
-        }
-    } 
+    sam.build_tree(); 
+    sam.guno();
 
-    ll l, r;
-    cin >> q;
-    while(q--) {
-        cin >> l >> r;
-        cout << ans[--l][--r] << nl;
+    ll ans = 0;
+    L(i, 1, sam.sz-1) { // DO NOT USE sz(sam.st).   DO NOT FORGET -1.
+        ans += sam.koyta(i) * sam.koybar[i] * (sam.koybar[i]-1) / 2; // :)
     }
+
+    n = sz(s);
+    cout << n*(n+1)/2 + ans << nl;
 
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
+    // int t; cin >> t; while(t--)
     solve();
 }

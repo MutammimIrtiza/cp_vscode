@@ -1,7 +1,7 @@
 vll factors[N];
-void prep(){ 
-    L(i, 1, 1000000){
-        for(ll j = i; j <= 1000000; j += i){
+void prep_factors(){ 
+    L(i, 1, N-1){
+        for(ll j = i; j <= N-1; j += i){
             factors[j].push_back(i);
         }
     }
