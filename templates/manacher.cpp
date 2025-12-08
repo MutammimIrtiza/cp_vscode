@@ -1,5 +1,3 @@
-// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
- 
 #include<bits/stdc++.h>
 using namespace std;
  
@@ -93,6 +91,10 @@ void prep(){
     
 }
  
+void maxself(int &a, int b) {
+    a = max(a, b);
+}
+ 
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
  
@@ -102,20 +104,38 @@ void solve(){
  
     // cleanup ?
  
-    string s; cin >> s; 
-    vector<ar<int,2>> radi = manacher(s);
-    ll pos, par, best = 0;
+    /*
+        we cant just apply for the border of longest palindrome obtained from manacher
+        we have to apply for ALL positions in the range upto that border
+        this can be costly, but can be done in O(n) neglecting previously updated positions, as the answer cant get better
+        proof: https://codeforces.com/blog/entry/142875
+    */
+ 
+    string s; cin >> s;
+    vector<int> ans(sz(s), 1);
+    auto radi = manacher(s); 
+    int j_even = 0, j_odd = 0;
+ 
     L(i,0,sz(s)-1) {
-        L(j,0,1) {
-            ll cur = j&1 ? 2*(radi[i][j]-1) + 1 : 2 * radi[i][j];
-            if(cur>best) pos = i, par = j, best = cur;
+        // odd
+        if(i + radi[i][1] - 1 >= j_odd) {
+            L(j, j_odd, i + radi[i][1] -1) {
+                maxself(ans[j], 2*(j-i)+1);
+            }
+            j_odd = i + radi[i][1];
+        }
+ 
+        // even. radius can be 0, careful
+        if(radi[i][0] and i + radi[i][0] - 1 >= j_even) {
+            L(j, j_even, i + radi[i][0] - 1) {
+                maxself(ans[j], 2*(j-i+1));
+            }
+            j_even = i + radi[i][0];
         }
     }
-    deb(radi);
-    string ans;
-    if(par&1) ans = s.substr(pos-radi[pos][1]+1, best);
-    else ans = s.substr(pos-radi[pos][0], best);
-    cout << ans << nl;
+ 
+    L(i,0,sz(s)-1) cout << ans[i] << gp;
+    cout << nl;
 }
  
 int main() {

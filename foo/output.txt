@@ -1,6 +1,7 @@
 
 Input: 
-ababb
+6
+ABCDB
 Output: 
-20
+0
 

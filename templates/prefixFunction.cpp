@@ -138,7 +138,7 @@ void prep(){
 ll n, m, x, y, z, q, k, u, v, w;
 vll a(N), b(N); 
 mint dp[1005][105]; // dp[i][j] = no. of strings of length i that have a suffix match of length j with prefix of s
-
+                                // but only allow 1 full occurence of s
 void solve(){
     
     // testcases ?
@@ -153,24 +153,21 @@ void solve(){
     // so push dp fits in well
     mint ans;
     dp[0][0] = 1;
-    L(i, 0, n) {
-        L(j, 0, m) {
+    L(i, 0, n-1) { // *** cannot extend n, start from 0 to push
+        L(j, 0, m-1) { // *** DO NOT EXTEND m : to avoid multiple occurence, see below for why
+
             // ive built some string of length i, having a suffix match of length j with prefix of s
             // in how many ways can i extend ?
 
-            // if ive reached the full prefix, i will update ans
-            // also, i will not extend this count further, coz it will build on top of this, and overcount
-            if(j==m) {
-                ans += dp[i][j] * power(26, n-i);
-                continue;
-            }
-            
-            // if full prefix not reached, i try extending with all chars, of course if i != n
             L(ch, 0, 25) {
-                if(i!=n) dp[i+1][ pref_aut[j][ch] ] += dp[i][j];
+                dp[i+1][ pref_aut[j][ch] ] += dp[i][j];
             }
         }
     }
+
+    // *** iterate over the first occurence of the string !!!
+    L(i, 1, n) ans += dp[i][m] * power(26, n-i);
+
     L(i,0,n) L(j,0,m) deb(i,j,dp[i][j]);
     cout << ans << nl;
 }

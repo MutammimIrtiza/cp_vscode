@@ -15,6 +15,7 @@ using namespace __gnu_pbds;
 #define vll vector<long long>
 #define pll pair<long long, long long>
 #define vvll vector<vll>
+#define vi vector<int>
 #define vvvll vector<vvll>
 #define ar array
 #define F first
@@ -26,20 +27,22 @@ using namespace __gnu_pbds;
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
+#define extract(m, x) { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); } // set, multiset, map
 #define gp " "
 #define nl "\n"
 #define yes cout<<"YES"<<nl
 #define no cout<<"NO"<<nl
 
-#define isSet(x, i)       (((x) >> (i)) & 1)
-#define setbit(x, i)      ((x) | (1LL << (i)))
-#define resetbit(x, i)    ((x) & (~(1LL << (i))))
-#define toggleBit(x, i)   ((x) ^ (1LL << (i)))
-#define clz(x)            ((sizeof(x) == 4) ? __builtin_clz(x) : __builtin_clzll(x))
-#define ctz(x)            ((sizeof(x) == 4) ? __builtin_ctz(x) : __builtin_ctzll(x))
-#define csb(x)            ((sizeof(x) == 4) ? __builtin_popcount(x) : __builtin_popcountll(x))
-#define msb(x)            ((sizeof(x) == 4) ? 31 - clz(x) : 63 - clz(x))
-#define lsb(x)            (ctz(x))
+#define isSet(x, i) ((x>>i)&1)
+#define setbit(x, i) (x | (1LL<<i))
+#define resetbit(x, i) (x & (~(1LL << i)))
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
+#define msb(x) ((x) ? (63 - __builtin_clzll((unsigned long long)(x))) : -1)
+#define lsb(x) ((x) ? (__builtin_ctzll((unsigned long long)(x))) : -1)
+
 
 #ifdef LOCAL
 #include "debug.h"
@@ -49,10 +52,8 @@ using namespace __gnu_pbds;
 
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
-const lld pi = 2*acos(0.0);
 const int mod = 1e9 + 7;
-const int N = 200005; ///////////////////////////////////////
-const int rt = 450;
+// const int N = ; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 void prep(){
@@ -60,24 +61,21 @@ void prep(){
 }
 
 ll n, m, x, y, z, q, k, u, v, w;
-vll a(N), typ(N); 
 
-void solve(){
+void solve(int tcase){
     
     // testcases ?
 
     // cleanup ?
 
-    cout << "hello" << nl;
-    vector<ar<ll,3>> v;
-    v.push_back({2,3,4});
-    deb(v);
+    
 
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
-    solve();
+    int tcase = 1;
+    int t; cin >> t; for(; tcase <= t; ++tcase)
+    solve(tcase);
 }

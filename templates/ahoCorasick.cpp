@@ -63,6 +63,9 @@ const ll inf = 1e15; /////////////////////////////////////////////
     if no valid link/terminal link exists, it points to root (0)
     suffix links form a tree. [terminal links also form a tree ig?]
     if alphabet size is large, we can work with only suffix links and trie transitions.
+
+    IMPORTANT : usually if you visit a node and do sth, you probably also want to visit all terminal links and do the same
+
 */
 struct Aho {
     static const int K = 26; // alphabet size
@@ -182,6 +185,10 @@ void solve(){ // https://cses.fi/problemset/result/14686177/
             tem = aho.t[tem].term_link;
         }
     }
+    /*
+        for counting stuff :
+            build tree, do dp
+    */
     L(i,1,k) found[i] ? yes : no;
 }
 

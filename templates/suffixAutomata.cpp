@@ -96,6 +96,10 @@ const ll inf = 1e15; /////////////////////////////////////////////
         repitition of strings in a node = sum of reps. of children
         base case : 1 for was_terminal states
 
+    problems:
+        uses total : https://vjudge.net/contest/738971#problem/E
+        uses koybar and koyta : https://codeforces.com/edu/course/2/lesson/2/5/practice/contest/269656/problem/D
+        uses next : https://cses.fi/problemset/task/2102/
 */
 struct SAM {
     struct State {

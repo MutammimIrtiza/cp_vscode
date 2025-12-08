@@ -15,6 +15,7 @@ using namespace __gnu_pbds;
 #define vll vector<long long>
 #define pll pair<long long, long long>
 #define vvll vector<vll>
+#define vi vector<int>
 #define vvvll vector<vvll>
 #define ar array
 #define F first
@@ -36,10 +37,11 @@ using namespace __gnu_pbds;
 #define setbit(x, i) (x | (1LL<<i))
 #define resetbit(x, i) (x & (~(1LL << i)))
 #define toggleBit(x, i) ((x) ^ (1LL << (i)))
-#define getBit(x, i) (((x) >> (i)) & 1)
 #define clz(x) __builtin_clzll(x)
 #define ctz(x) __builtin_ctzll(x)
 #define csb(x) __builtin_popcountll(x)
+#define msb(x) ((x) ? (63 - __builtin_clzll((unsigned long long)(x))) : -1)
+#define lsb(x) ((x) ? (__builtin_ctzll((unsigned long long)(x))) : -1)
 
 
 #ifdef LOCAL
@@ -51,7 +53,7 @@ using namespace __gnu_pbds;
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
-const int N = ; ///////////////////////////////////////
+// const int N = ; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 void prep(){

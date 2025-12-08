@@ -134,8 +134,7 @@ void solve(){
     prep_lca(1);
     while(q--) {
         cin >> u >> v;
-        ll lca = find_lca(u, v);
-        cout << depth[u] + depth[v] - 2*depth[lca] << nl;
+        cout << distance(u,v) << nl;
     }
 
 }
