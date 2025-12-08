@@ -142,6 +142,13 @@ struct Aho {
                 
         }
     }
+
+    void form_tree() {
+        gr.resize(t.size());
+        L(state, 1, t.size()-1) {
+            gr[t[state].term_link].push_back(state);
+        }
+    }
 };
 
 void prep(){

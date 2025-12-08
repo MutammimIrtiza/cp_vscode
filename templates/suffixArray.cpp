@@ -135,6 +135,31 @@ vll build_lcp(const string &ins, vi &sa) {
     }
     return lcp;
 }
+pair<int,int> find_range(string &t, string &s, vi &sa) { // find range [l,r] in sa where string t appears
+    ll lo = 1;
+    ll hi = sz(s);
+    ll first = -1;
+    while(lo <= hi) {
+        ll mid = lo+hi>>1;
+        string plz = s.substr(sa[mid], sz(t)); 
+        if(plz >= t) {
+            first = mid; hi = mid-1;
+        } else lo = mid+1;
+    }
+    if(first == -1 || s.substr(sa[first], sz(t)) != t) return {0, 0};
+
+    lo = 1;
+    hi = sz(s);
+    ll last = -1;
+    while(lo <= hi) {
+        ll mid = lo+hi>>1;
+        string plz = s.substr(sa[mid], sz(t));
+        if(plz <= t) {
+            last = mid; lo = mid+1;
+        } else hi = mid-1;
+    }
+    return {first, last};
+}
 
 void prep(){
 
@@ -159,37 +184,9 @@ void solve(int tcase){ // https://codeforces.com/edu/course/2/lesson/2/3/practic
     cin >> q;
     while(q--) {
         string t; cin >> t;
-
-        // first ( >= t ) [0 0 0 1 1 1 1 1]
-        ll lo = 1;
-        ll hi = sz(s);
-        ll first = -1;
-        while(lo <= hi) {
-            ll mid = lo+hi>>1;
-            string plz = s.substr(sa[mid], sz(t)); 
-            if(plz >= t) {
-                first = mid; hi = mid-1;
-            } else lo = mid+1;
-        }
-
-
-        if(first == -1 || s.substr(sa[first], sz(t)) != t) {cout << 0 << nl; continue;}
-
-
-        // last ( <= t ) [1 1 1 1 0 0 0 0]
-        lo = 1;
-        hi = sz(s);
-        ll last = -1;
-        while(lo <= hi) {
-            ll mid = lo+hi>>1;
-            string plz = s.substr(sa[mid], sz(t));
-            if(plz <= t) {
-                last = mid; lo = mid+1;
-            } else hi = mid-1;
-        }
-
-        cout << last-first+1 << nl;
-
+        pair<int,int> pos = find_range(t,s,sa);
+        if(pos.F > 0) cout << pos.S-pos.F+1 << nl;
+        else cout << 0 << nl;
     }
 
 }
