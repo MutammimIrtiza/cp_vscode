@@ -6,7 +6,7 @@
 #define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
 using namespace __gnu_pbds;
 // *st.find_by_order(i) : ith largest element
-// st.order_of_key(k) : The number of items that are strictly smaller than k 
+// st.order_of_key(k) : number of items strictly smaller than k 
 
     using ll = long long;
     using vll = vector<long long>;

@@ -103,7 +103,8 @@ void solve(int tcase){
     // cleanup ?
 
     /*
-        for problems like sum/count involving submaks/supermask, we use sos dp to avoid overcounting.
+        for problems like sum/count involving submaks/supermask, 
+            we use sos dp to avoid overcounting.
         x|y = x  :  y is submask of x
         x&y = x  :  y is supermask of x
         x&y = 0  :  y is submask of ~x

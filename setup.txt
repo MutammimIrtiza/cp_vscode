@@ -1,16 +1,7 @@
-install wsl
-
+mkdir -p ~/bin
+mv f ~/bin
+chmod +x ~/bin/f
 vim ~/.bashrc
-
-at the end, paste :
-d() { ./d.sh "$1"; }
-ff() { ./ff.sh "$1"; }
-run() { ./run.sh "$1"; }
-
-close terminal
-
-open new terminal, go to problem folder
-
-
-
-should work now
+add line : export PATH="$HOME/bin:$PATH"
+:wq
+source ~/.bashrc

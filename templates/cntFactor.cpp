@@ -8,8 +8,6 @@ void prep(){
     }
 }
 
-
-
 ll properFactorCnt[1000001];
 void prep(){ 
     ll n = 1e6;

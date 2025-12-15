@@ -1,0 +1,18 @@
+#!/bin/bash
+SRC=code.cpp
+EXE=a.out
+
+g++ -std=c++17 -O2 -Wno-unused-result $SRC -o $EXE
+
+if [ $? -ne 0 ]; then
+    echo "Compilation failed!"
+    exit 1
+fi
+
+echo 
+echo "Input:"
+cat "$1"
+echo
+echo "Output:"
+"./$EXE" < "$1"
+echo
