@@ -68,7 +68,15 @@ void solve(int tcase){
 
     // cleanup ?
 
+    cin >> n >> k;
+    vll a(n+1); 
+    L(i, 1, n) cin >> a[i];
     
+    L(i, 2, n) {
+        ll d = a[i] - a[i-1];
+        
+        
+    }
 
 }
 
@@ -76,6 +84,6 @@ int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
-    int t; cin >> t; for(; tcase <= t; ++tcase)
+    // int t; cin >> t; for(; tcase <= t; ++tcase)
     solve(tcase);
 }
