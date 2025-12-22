@@ -10,6 +10,7 @@ using namespace std;
 using namespace __gnu_pbds;
 #define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
 
+#define int long long
 #define ll long long
 #define lld long double
 #define vll vector<long long>
@@ -23,7 +24,7 @@ using namespace __gnu_pbds;
 
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
-#define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
+#define rep(i, a, b) for(long long i = (a); i < (b); ++(i))
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
@@ -68,22 +69,14 @@ void solve(int tcase){
 
     // cleanup ?
 
-    cin >> n >> k;
-    vll a(n+1); 
-    L(i, 1, n) cin >> a[i];
     
-    L(i, 2, n) {
-        ll d = a[i] - a[i-1];
-        
-        
-    }
 
 }
 
-int main() {
+int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
-    // int t; cin >> t; for(; tcase <= t; ++tcase)
+    int t; cin >> t; for(; tcase <= t; ++tcase)
     solve(tcase);
 }

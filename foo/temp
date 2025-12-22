@@ -10,7 +10,6 @@ using namespace std;
 using namespace __gnu_pbds;
 #define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
 
-#define int long long
 #define ll long long
 #define lld long double
 #define vll vector<long long>
@@ -24,7 +23,7 @@ using namespace __gnu_pbds;
 
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
-#define rep(i, a, b) for(long long i = (a); i < (b); ++(i))
+#define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
@@ -44,7 +43,6 @@ using namespace __gnu_pbds;
 #define msb(x) ((x) ? (63 - __builtin_clzll((unsigned long long)(x))) : -1)
 #define lsb(x) ((x) ? (__builtin_ctzll((unsigned long long)(x))) : -1)
 
-
 #ifdef LOCAL
 #include "debug.h"
 #else
@@ -61,6 +59,69 @@ void prep(){
     
 }
 
+struct PalindromicTree {
+  struct node {
+    int nxt[28], len, st, en, link, cnt, oc1, oc2;
+  };
+  string s; int l1;
+  vector<node> t;
+  int sz, last;
+  PalindromicTree() {}
+  PalindromicTree(string _s, int sza) {
+    s = _s; l1 = sza;
+    int n = s.size();
+    t.clear();
+    t.resize(n + 9);
+    sz = 2, last = 2;
+    t[1].len = -1, t[1].link = 1;
+    t[2].len = 0, t[2].link = 1;
+  }
+ int extend(int pos){//returns 1 if it creates a new palindrome
+    int cur = last, curlen = 0;
+    int ch = s[pos] - 'a';
+    while (1) {
+      curlen = t[cur].len;
+      if(pos-1-curlen >= 0 && s[pos-1-curlen] == s[pos]) break;
+      cur = t[cur].link;
+    }
+    if (t[cur].nxt[ch]) {
+      last = t[cur].nxt[ch];
+      if(pos < l1) t[last].oc1++;
+      else t[last].oc2++;
+      return 0;
+    }
+    sz++;
+    last = sz;
+    if(pos < l1) t[sz].oc1 = 1;
+    else t[sz].oc2 = 1;
+    t[sz].len = t[cur].len + 2;
+    t[cur].nxt[ch] = sz;
+    t[sz].en = pos;
+    t[sz].st = pos - t[sz].len + 1;
+    if (t[sz].len == 1) {
+      t[sz].link = 2;
+      t[sz].cnt = 1;
+      return 1;
+    }
+    while (1) {
+      cur = t[cur].link;
+      curlen = t[cur].len;
+      if (pos-1-curlen >= 0 && s[pos-1-curlen] == s[pos]) {
+        t[sz].link = t[cur].nxt[ch];
+        break;
+      }
+    }
+    t[sz].cnt = 1 + t[t[sz].link].cnt;
+    return 1;
+  }
+  void calc_occurrences() {
+    for (int i = sz; i >= 3; i--)  {
+        t[t[i].link].oc1 += t[i].oc1; 
+        t[t[i].link].oc2 += t[i].oc2; 
+    }
+  }
+};
+
 ll n, m, x, y, z, q, k, u, v, w;
 
 void solve(int tcase){
@@ -69,11 +130,19 @@ void solve(int tcase){
 
     // cleanup ?
 
-    
-
+    string a, b; cin >> a >> b;
+    string s = a; s += 'z'+1; s += 'z'+2; s += b;
+    PalindromicTree pt(s, sz(a));
+    L(i, 0, sz(s)-1) pt.extend(i);
+    ll ans = 0;
+    L(i, 3, pt.sz) {
+        deb(pt.t[i].oc1, pt.t[i].oc2);
+        ans += pt.t[i].oc1 * pt.t[i].oc2;
+    }
+    cout << ans << nl;
 }
 
-int32_t main() {
+int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
