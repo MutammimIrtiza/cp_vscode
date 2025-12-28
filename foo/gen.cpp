@@ -18,21 +18,30 @@ int main() {
 
     cout << 1 << endl;
 
-    int n = rnd(2, 5);
-    int k = (rnd(1, n));
-    int r = rnd(1, n);
-    int l = rnd(1, r);
-    cout << n << " " << k << " " << l << " " << r << "" << endl;
+//     int n = rnd(2, 5);
+//     int k = (rnd(1, n));
+//     int r = rnd(1, n);
+//     int l = rnd(1, r);
+//     cout << n << " " << k << " " << l << " " << r << "" << endl;
 
-    for(int i = 1; i <= n; ++i) {
-        int u, v;
-        u = rnd(1, 2*n);
-        // do{
-        //     v = rnd(1, n);
-        // } while(u == v || tree.count({u, v}) || tree.count({v, u}));
-        // tree.insert({u, v});
-        cout << u << gp;
+//     for(int i = 1; i <= n; ++i) {
+//         int u, v;
+//         u = rnd(1, 2*n);
+//         // do{
+//         //     v = rnd(1, n);
+//         // } while(u == v || tree.count({u, v}) || tree.count({v, u}));
+//         // tree.insert({u, v});
+//         cout << u << gp;
+//     }
+// cout << nl;
+
+    int n = rnd(1, 10);
+    string a, b;
+    for(int i = 1; i <= n; i++) {
+        a.push_back('a' + rnd(0, 2));
+        b.push_back('a' + rnd(0, 2));
     }
-cout << nl;
+    cout << n << endl;
+    cout << a << endl << b << endl;
 
 }

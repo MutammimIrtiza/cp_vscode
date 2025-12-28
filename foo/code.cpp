@@ -69,7 +69,67 @@ void solve(int tcase){
 
     // cleanup ?
 
-    
+    cin >> n >> k;
+    vll gr[n+1];
+    L(i, 1, n-1) {
+        cin >> u >> v;
+        gr[u].push_back(v); gr[v].push_back(u);
+    }   
+
+    vll minguard(n+1), maxuncv(n+1);
+    bool vis[n+1];
+
+    function<void(int, int, int&)>
+    dfs = [&](int node, int rad, int &cnt)  {
+        minguard[node] = inf, maxuncv[node] = 0; vis[node] = 1;
+
+        for(ll ch : gr[node]) {
+            if(!vis[ch]) {
+                dfs(ch, rad, cnt);
+                minguard[node] = min(minguard[node], minguard[ch]+1);
+                maxuncv[node] = max(maxuncv[node], maxuncv[ch]+1);
+            }
+        }
+
+
+        if(minguard[node] + maxuncv[node] <= rad) {
+            maxuncv[node] = -inf;
+        } else {
+            if(maxuncv[node] == rad) {
+                minguard[node] = 0; cnt++;
+                maxuncv[node] = -inf;
+            }
+        }
+
+        // we leave a node with  0 < maxunc[node] < rad  to be covered by some upper node
+        // but the root has no upper node, right?
+        // so we need extra check for root
+
+        if(node == 1) {
+            if(maxuncv[node] >= 0) cnt++;
+        }
+
+    };
+
+    auto ok = [&](ll rad) {
+        ll cnt = 0;
+        memset(vis, 0, sizeof vis);
+        dfs(1, rad, cnt); 
+        return cnt <= k;
+    };
+
+    ll lo = 0;
+    ll hi = n;
+    ll ans;
+    while(lo <= hi) {
+        ll mid = lo+hi>>1;
+        if(ok(mid)) {
+            ans = mid;
+            hi = mid-1;
+        } else lo = mid+1;
+    }
+
+    cout << ans << nl;
 
 }
 

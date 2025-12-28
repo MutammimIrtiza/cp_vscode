@@ -1,19 +1,21 @@
 struct Seg {
-	typedef int T;
-	static constexpr T unit = INT_MIN;  // set accordingly
-	T f(T a, T b) { return max(a, b); } // (any associative fn)
-	vector<T> s; int n;
-	Seg(int n = 0, T def = unit) : s(2*n, def), n(n) {}
-	void update(int pos, T val) {
-		for (s[pos += n] = val; pos /= 2;)
-			s[pos] = f(s[pos * 2], s[pos * 2 + 1]);
-	}
-	T query(int b, int e) { // query [b, e)
-		T ra = unit, rb = unit;
-		for (b += n, e += n; b < e; b /= 2, e /= 2) {
-			if (b % 2) ra = f(ra, s[b++]);
-			if (e % 2) rb = f(s[--e], rb);
-		}
-		return f(ra, rb);
-	}
+    using T = int;                 // change type if needed
+    static constexpr T unit = 0;   // identity element
+    int n;   vector<T> t;
+
+    Seg(int _n = 0) : n(_n), t(2 * n, unit) {}
+    T f(T a, T b) { return a + b; } // change operation
+
+    void update(int p, T value) {
+        for (t[p += n] = value; p > 1; p >>= 1)
+            t[p>>1] = f(t[p], t[p^1]);
+    }
+    T query(int l, int r) { // [l, r)
+        T resL = unit, resR = unit;
+        for (l += n, r += n; l < r; l >>= 1, r >>= 1) {
+            if (l & 1) resL = f(resL, t[l++]);
+            if (r & 1) resR = f(t[--r], resR);
+        }
+        return f(resL, resR);
+    }
 };
