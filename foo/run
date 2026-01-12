@@ -8,7 +8,7 @@ for INPUT_FILE in in in[0-9]*; do
         cat "$INPUT_FILE"
 
         echo "Output:"
-        ./a.exe < "$INPUT_FILE"
+        ./a.out < "$INPUT_FILE"
         echo ""
     fi
 done

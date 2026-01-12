@@ -54,7 +54,7 @@ using namespace __gnu_pbds;
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
-// const int N = ; ///////////////////////////////////////
+const int N = 1000006; ///////////////////////////////////////
 const ll inf = 1e15; /////////////////////////////////////////////
 
 void prep(){
@@ -63,73 +63,48 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 
+vll rights[N];
+ll jump[N][21];
 void solve(int tcase){
     
     // testcases ?
 
     // cleanup ?
 
-    cin >> n >> k;
-    vll gr[n+1];
-    L(i, 1, n-1) {
-        cin >> u >> v;
-        gr[u].push_back(v); gr[v].push_back(u);
-    }   
+    cin >> n >> q;
+    multiset<ll> ends;
 
-    vll minguard(n+1), maxuncv(n+1);
-    bool vis[n+1];
-
-    function<void(int, int, int&)>
-    dfs = [&](int node, int rad, int &cnt)  {
-        minguard[node] = inf, maxuncv[node] = 0; vis[node] = 1;
-
-        for(ll ch : gr[node]) {
-            if(!vis[ch]) {
-                dfs(ch, rad, cnt);
-                minguard[node] = min(minguard[node], minguard[ch]+1);
-                maxuncv[node] = max(maxuncv[node], maxuncv[ch]+1);
-            }
-        }
-
-
-        if(minguard[node] + maxuncv[node] <= rad) {
-            maxuncv[node] = -inf;
-        } else {
-            if(maxuncv[node] == rad) {
-                minguard[node] = 0; cnt++;
-                maxuncv[node] = -inf;
-            }
-        }
-
-        // we leave a node with  0 < maxunc[node] < rad  to be covered by some upper node
-        // but the root has no upper node, right?
-        // so we need extra check for root
-
-        if(node == 1) {
-            if(maxuncv[node] >= 0) cnt++;
-        }
-
-    };
-
-    auto ok = [&](ll rad) {
-        ll cnt = 0;
-        memset(vis, 0, sizeof vis);
-        dfs(1, rad, cnt); 
-        return cnt <= k;
-    };
-
-    ll lo = 0;
-    ll hi = n;
-    ll ans;
-    while(lo <= hi) {
-        ll mid = lo+hi>>1;
-        if(ok(mid)) {
-            ans = mid;
-            hi = mid-1;
-        } else lo = mid+1;
+    L(i,1,n) {
+        int l, r; cin >> l >> r;
+        rights[l].push_back(r);
+        ends.insert(r);
     }
 
-    cout << ans << nl;
+    L(i,0,N-1) jump[i][0] = N-1;
+
+    L(i,1,N-1) {
+        if(sz(ends)) jump[i][0] = *ends.begin();
+        for(ll x : rights[i]) extract(ends, x);
+    }
+
+    L(j,1,20) {
+        L(i,1,N-1) {
+            jump[i][j] = jump[ jump[i][j-1] ][j-1];
+        }
+    }
+
+    L(qry,1,q) {
+        int l, r; cin >> l >> r;
+        ll ans = 0, cur = l;
+        R(j, 20, 0) {
+            if(jump[cur][j] <= r) {
+                ans += (1LL<<j);
+                cur = jump[cur][j];
+                deb(j, cur, ans);
+            }
+        }
+        cout << ans << nl;
+    }
 
 }
 
@@ -137,6 +112,6 @@ int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
-    int t; cin >> t; for(; tcase <= t; ++tcase)
+    // int t; cin >> t; for(; tcase <= t; ++tcase)
     solve(tcase);
 }
