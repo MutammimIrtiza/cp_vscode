@@ -54,8 +54,102 @@ using namespace __gnu_pbds;
 mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 1e9 + 7;
-const int N = 1000006; ///////////////////////////////////////
-const ll inf = 1e15; /////////////////////////////////////////////
+// const int N = ; ///////////////////////////////////////
+const ll inf = 1e18; /////////////////////////////////////////////
+
+// struct Node {
+//     Node *left = nullptr, *right = nullptr;  ll sum = 0;
+//     ~Node() {delete left; delete right;}
+// };
+// // Builds a segment tree on [l, r)
+// // Returns a pointer to the constructed tree.
+// Node *build(int l, int r) {
+//     Node *p = new Node();
+//     if (r - l == 1) return p;
+//     int m = (l + r) / 2;
+//     p->left = build(l, m);
+//     p->right = build(m, r);
+//     return p;
+// }
+// // Changes value in position k to x in tree p.
+// // Returns a pointer to the new tree.
+// Node *change(Node *p, int l, int r, int k, int x) {
+//     Node *n = new Node(*p);
+//     if (r - l == 1) { n->sum = x; }
+//     else {
+//         int m = (l + r) / 2;
+//         if (k < m) { n->left = change(p->left, l, m, k, x); }
+//         else { n->right = change(p->right, m, r, k, x); }
+//         n->sum = n->left->sum + n->right->sum;
+//     } return n;
+// }
+// // Returns the sum of values in range [ql, qr).
+// ll query(Node *p, int l, int r, int ql, int qr) {
+//     if (qr <= l || r <= ql) return 0;
+//     if (ql <= l && r <= qr) return p->sum;
+//     int m = (l + r) / 2;
+//     return query(p->left, l, m, ql, qr) + 
+//             query(p->right, m, r, ql, qr);
+// }
+
+// #include <vector>
+// #include <set>
+// #include <cstdint> // for int64_t, assuming ll is int64_t
+
+
+
+struct Node {
+    Node *left = nullptr, *right = nullptr;
+    ll sum = 0;
+};
+
+struct PerSegTree {
+    std::set<Node*> allocated_nodes;
+    std::vector<Node*> roots;
+    int n;
+    PerSegTree(int n) : n(n) { roots.push_back(build(0, n)); }
+    ~PerSegTree() {
+        for (auto ptr : allocated_nodes) delete ptr;
+    }
+private:
+    Node* build(int l, int r) {
+        Node* p = new Node();  allocated_nodes.insert(p);
+        if (r - l == 1) return p;
+        int m = (l + r) / 2;
+        p->left = build(l, m);  p->right = build(m, r);
+        return p;
+    }
+    Node* change(Node* p, int l, int r, int k, int x) {
+        Node* n = new Node(*p);  allocated_nodes.insert(n);
+        if (r - l == 1) { n->sum = x; }
+        else {
+            int m = (l + r) / 2;
+            if (k < m) n->left = change(p->left, l, m, k, x);
+            else n->right = change(p->right, m, r, k, x);
+            n->sum = n->left->sum + n->right->sum;
+        }
+        return n;
+    }
+    ll query(Node* p, int l, int r, int ql, int qr) {
+        if (qr <= l || r <= ql) return 0;
+        if (ql <= l && r <= qr) return p->sum;
+        int m = (l + r) / 2;
+        return query(p->left, l, m, ql, qr) +
+               query(p->right, m, r, ql, qr);
+    }
+public:
+    // // Creates a new version by changing position k to x.
+    // Returns the new version index.
+    int update(int version, int k, int x) {
+        Node* new_root = change(roots[version], 0, n, k, x);
+        roots.push_back(new_root);
+        return roots.size() - 1;
+    }
+    // Queries the sum in [ql, qr) for the given version.
+    ll query(int version, int ql, int qr) {
+        return query(roots[version], 0, n, ql, qr);
+    }
+};
 
 void prep(){
     
@@ -63,48 +157,125 @@ void prep(){
 
 ll n, m, x, y, z, q, k, u, v, w;
 
-vll rights[N];
-ll jump[N][21];
 void solve(int tcase){
     
     // testcases ?
 
     // cleanup ?
 
-    cin >> n >> q;
-    multiset<ll> ends;
+    /*
+        if i fix a position
+        and bin search on available cows to find the least one that can sit here
+        i just need O(1) or O(log) way of verifying if the position is ok for the cow
+    */
 
+    cin >> n >> k;
+    vector<ll> a(n+1); L(i,1,n) {cin >> a[i];}
+
+    vector<pll> b(n+1); L(i,1,n) {b[i] = {a[i], -i};}
+    sort(range(b, 1, n));
+    vll ans(n+1);
+    // map<ll, ll> pos; L(i,1,n) pos[b[i].S] = i;
+    
+    vll d(n+1);
+    ll s = 0;
+    L(i,1,n){
+        d[i] = a[i] - s;
+        s += a[i];
+    }
+
+    map<ll, ll> compd; int id = 0;
     L(i,1,n) {
-        int l, r; cin >> l >> r;
-        rights[l].push_back(r);
-        ends.insert(r);
+        if(d[i] <= 0) continue;
+        if(!compd.count(d[i])) compd[d[i]] = id++;
+        // cout << d[i ] << nl;
     }
+    // cout << "id: " << id << nl;
 
-    L(i,0,N-1) jump[i][0] = N-1;
+    PerSegTree prefd(id);
 
-    L(i,1,N-1) {
-        if(sz(ends)) jump[i][0] = *ends.begin();
-        for(ll x : rights[i]) extract(ends, x);
-    }
-
-    L(j,1,20) {
-        L(i,1,N-1) {
-            jump[i][j] = jump[ jump[i][j-1] ][j-1];
+    
+    L(i,1,n) {
+        // cout << "hi " << i << nl;
+        if(d[i] <= 0) {
+            prefd.roots.push_back(prefd.roots.back()); continue;
         }
+        d[i] = compd[d[i]];
+        ll prev = prefd.query(i-1, d[i], d[i]+1);
+        // cout << d[i] << gp << prev << nl;
+        prefd.update(i-1, d[i], prev+1);
     }
 
-    L(qry,1,q) {
-        int l, r; cin >> l >> r;
-        ll ans = 0, cur = l;
-        R(j, 20, 0) {
-            if(jump[cur][j] <= r) {
-                ans += (1LL<<j);
-                cur = jump[cur][j];
-                deb(j, cur, ans);
+    // cout << "Prefd: " << nl;
+    // L(i,0,n) {
+    //     cout << i << "[" << gp;
+    //     L(j,0,id-1) {
+    //         cout << query(prefd[i], 0, id, j, j+1) << gp;
+    //     }
+    //     cout << gp << "]" << nl;
+    // }
+
+    vll pref(n+1); L(i,1,n) pref[i] = pref[i-1] + a[i];
+
+    L(pos, 1, n) {
+        ll lo = 1, hi = n;
+        ll x = -1;
+        while(lo <= hi) {
+            ll mid = (lo+hi)/2;
+            auto [_, p] = b[mid]; p = -p;
+            if(pos==4) {
+                cout << _ << gp << p << nl;
             }
+            if(p <= pos) {
+                int c = 0;
+                ll lefts = pref[pos] - a[p];
+                c += lefts >= a[p];
+                ll pore = - prefd.query(pos,  0, id) + prefd.query(n,  0, id); 
+                c += pore;
+                if(c <= k) x = mid, hi = mid-1;
+                else lo = mid + 1;       
+                if(pos == 4 and _==1) {
+                    cout << "174" << nl;
+                    cout << lefts << gp << pore << gp << c << nl;
+                    cout << prefd.query(p, 0, id) << gp <<  prefd.query(n,  0, id) << nl;
+                }        
+            } else {
+                int c = 0;
+                ll lefts = pref[pos-1];
+                c += lefts >= a[p];
+                ll pore = -prefd.query(p, 0, id) + prefd.query(n, 0, id); 
+                if(compd.upper_bound(a[p]) != compd.end()) {
+                    ll md = (*compd.upper_bound(a[p])).S;
+                    pore += -prefd.query(pos-1, md, id) + prefd.query(p-1, md, id); 
+                }
+                c += pore;
+                if(c <= k) x = mid, hi = mid-1;
+                else lo = mid + 1; 
+                if(pos == 4 and _==1) {
+                    cout << "174" << nl;
+                    cout << lefts << gp << pore << gp << c << nl;
+                    cout << prefd.query(pos, 0, id) << gp <<  prefd.query(n, 0, id) << nl;
+                }       
+            }
+            if(pos==4)
+            cout << "lo: " << lo << gp << "hi: " << hi << nl;
         }
-        cout << ans << nl;
+        if(x != -1) ans[x]++;
+        cout << "x: " << gp << x << nl;
     }
+    L(i,1,n) ans[i] += ans[i-1];
+
+    vll res(n+1); L(i,1,n) res[-b[i].S] = ans[i];
+    L(i,1,n) cout << res[i] << gp;
+    cout << nl;
+
+
+
+
+
+    vvvll dp(n+1, vvll(n+1, vll(2, -1)));
+
+    L(i,1,n) deb(dp[i]);
 
 }
 
@@ -112,6 +283,6 @@ int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int tcase = 1;
-    // int t; cin >> t; for(; tcase <= t; ++tcase)
+    int t; cin >> t; for(; tcase <= t; ++tcase)
     solve(tcase);
 }
