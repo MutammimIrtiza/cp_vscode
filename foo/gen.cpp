@@ -1,15 +1,15 @@
-// #include <bits/stdc++.h>
-// using namespace std;
+#include <bits/stdc++.h>
+using namespace std;
 
-// #define ll long long
-// #define nl "\n"
-// #define gp " "
+#define ll long long
+#define nl "\n"
+#define gp " "
 
-// mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
-// inline ll rnd(ll l, ll r) {
-//     return uniform_int_distribution<ll>(l, r)(rng);
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+inline ll rnd(ll l, ll r) {
+    return uniform_int_distribution<ll>(l, r)(rng);
 
-// }
+}
 
 // int main() {
 //     ios::sync_with_stdio(false);
@@ -54,38 +54,43 @@
 
 // }
 
-#include <bits/stdc++.h>
-using namespace std;
-using ll = long long;
+// #include <bits/stdc++.h>
+// using namespace std;
+// using ll = long long;
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n = 8, q = 15;
-    cout << n << " " << q << "\n";
+    // int n = 8, q = 15;
+    // cout << n << " " << q << "\n";
 
-    // Arya
-    ll s1 = 3, v1 = 10;   // v multiple of 5, short flight
-    cout << s1 << " " << v1 << "\n";
+    // // Arya
+    // ll s1 = 3, v1 = 10;   // v multiple of 5, short flight
+    // cout << s1 << " " << v1 << "\n";
 
-    vector<pair<ll,ll>> others = {
-        {3,10},   // identical
-        {3,11},   // same s, slightly faster
-        {3,9},    // same s, slightly slower
-        {4,10},   // same v, later
-        {2,10},   // same v, earlier
-        {3,5},    // v exactly 5 (edge of air)
-        {0,20},   // long flight, intersects
-    };
+    // vector<pair<ll,ll>> others = {
+    //     {3,10},   // identical
+    //     {3,11},   // same s, slightly faster
+    //     {3,9},    // same s, slightly slower
+    //     {4,10},   // same v, later
+    //     {2,10},   // same v, earlier
+    //     {3,5},    // v exactly 5 (edge of air)
+    //     {0,20},   // long flight, intersects
+    // };
 
-    for(auto &p: others){
-        cout << p.first << " " << p.second << "\n";
-    }
+    // for(auto &p: others){
+    //     cout << p.first << " " << p.second << "\n";
+    // }
 
-    vector<ll> queries = {
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
-    };
+    // vector<ll> queries = {
+    //     0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+    // };
 
-    for(ll T: queries) cout << T << "\n";
+    // for(ll T: queries) cout << T << "\n";
+
+    int n = rnd(1, 20);
+    string s; for(int i = 0; i < n; i++) s.push_back('a'+rnd(0,1));
+    cout << s << endl;
+
 }

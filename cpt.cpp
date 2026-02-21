@@ -3,20 +3,21 @@ using namespace std;
 
 // Extra functionality :
 // *st.find_by_order(index) = value at index
-// st.order_of_key(value) = number of elements strictly less than value
+// st.order_of_key(x) = no. of elements strictly less than x
 
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 using namespace __gnu_pbds;
-#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+#define ordered_set tree<int, null_type,less<int>, \
+ rb_tree_tag,tree_order_statistics_node_update>
 
 #define int long long
 #define ll long long
 #define lld long double
-#define vll vector<long long>
-#define pll pair<long long, long long>
-#define vvll vector<vll>
 #define vi vector<int>
+#define pll pair<ll, ll>
+#define vll vector<ll>
+#define vvll vector<vll>
 #define vvvll vector<vvll>
 #define ar array
 #define F first
@@ -28,7 +29,8 @@ using namespace __gnu_pbds;
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
-#define extract(m, x) { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); } // set, multiset, map
+#define extract(m, x) \
+ { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); }
 #define gp " "
 #define nl "\n"
 #define yes cout<<"YES"<<nl
@@ -41,42 +43,66 @@ using namespace __gnu_pbds;
 #define clz(x) __builtin_clzll(x)
 #define ctz(x) __builtin_ctzll(x)
 #define csb(x) __builtin_popcountll(x)
-#define msb(x) ((x) ? (63 - __builtin_clzll((unsigned long long)(x))) : -1)
-#define lsb(x) ((x) ? (__builtin_ctzll((unsigned long long)(x))) : -1)
-
+#define msb(x) ((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
+#define lsb(x) ((x) ? (__builtin_ctzll((ll)(x))) : -1)
 
 #ifdef LOCAL
-#include "debug.h"
-#else
-#define deb(...) (void)0
-#endif
+template<class T> 
+auto pr(T x) -> decltype(cerr<<x, void()) {cerr<<x;}
+void pr(string s) {cerr << '"' << s << '"';}
 
-mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
-const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
-const int mod = 1e9 + 7;
-// const int N = ; ///////////////////////////////////////
-const ll inf = 1e15; /////////////////////////////////////////////
-
-void prep(){
-    
+template<class A, class B>
+void pr(pair<A,B> p){
+    cerr << "{";   pr(p.F);   cerr << ", ";
+    pr(p.S);   cerr << "}";
 }
 
-ll n, m, x, y, z, q, k, u, v, w;
+template<class T>
+auto pr(T v) -> decltype(v.begin(), void()){
+    cerr << "[";   
+    bool f = 1;
+    for(auto x : v){
+        if(!f) cerr << ", ";
+        f = false;
+        pr(x);
+    }
+    cerr << "]";
+}
+
+void d_b(){ cerr << " ]\n"; }
+
+template<class T,  class... U>
+void d_b(T& t,  U&... u){
+    pr(t);  if(sizeof...(u)) cerr << ", ";   
+    d_b(u...);
+}
+
+#define deb(...) \
+cerr<<__LINE__<<": ["<<#__VA_ARGS__<<"] = [" , d_b(__VA_ARGS__)
+
+#else
+#define deb(...)
+#endif
+
+mt19937_64 \
+rnd(chrono::steady_clock::now().time_since_epoch().count());
+const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
+const int mod = 1e9 + 7;
+// const int N = ; 
+const ll inf = 1e18; 
+
+void prep(){
+
+}
 
 void solve(int tcase){
     
-    // testcases ?
-
-    // cleanup ?
-
-    
-
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int tcase = 1;
-    int t; cin >> t; for(; tcase <= t; ++tcase)
-    solve(tcase);
+    int t = 1;
+    // cin >> t;
+    L(i, 1, t) solve(i);
 }

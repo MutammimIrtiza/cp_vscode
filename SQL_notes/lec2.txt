@@ -1,0 +1,30 @@
+## DDL and DML
+
+to have multiple attributes in primary key, we NEED table level constrainst
+
+
+how to handle deletion of rows in case of foreign key?
+use constraint : ON DELETE CASCADE / ON DELETE SET NULL 
+
+
+what is the default format of date in oracle ?
+
+
+
+chen notation : represent many to many relationships directly
+crows foot : must create separate table
+
+
+***
+Ask yourself:
+
+“If the owner entity is deleted, does this entity still make sense to exist?”
+
+If it cannot exist → weak
+If it can exist → strong
+
+Examples:
+
+Entity		Weak?		Why
+OrderItem	✅ Weak		Cannot exist without Order
+

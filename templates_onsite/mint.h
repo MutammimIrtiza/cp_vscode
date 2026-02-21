@@ -24,6 +24,10 @@ struct mint{
   mint a=*this,  res=1;
   while(n) { if(n&1)res*=a;  a*=a;  n>>=1;}
   return res; }
+
+  explicit operator bool() const { return x != 0; }
+  friend ostream& operator<<(ostream& os, const mint& m) \
+   { return os << m.x; }
 };
 
 mint power(mint a,ll n){ return a.power(n); }
