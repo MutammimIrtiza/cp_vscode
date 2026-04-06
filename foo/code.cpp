@@ -43,8 +43,8 @@ using namespace __gnu_pbds;
 #define clz(x) __builtin_clzll(x)
 #define ctz(x) __builtin_ctzll(x)
 #define csb(x) __builtin_popcountll(x)
-#define msb(x) ((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
-#define lsb(x) ((x) ? (__builtin_ctzll((ll)(x))) : -1)
+#define msb(x) (ll)((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
+#define lsb(x) (ll)((x) ? (__builtin_ctzll((ll)(x))) : -1)
 
 #ifdef LOCAL
 template<class T> 
@@ -55,6 +55,16 @@ template<class A, class B>
 void pr(pair<A,B> p){
     cerr << "{";   pr(p.F);   cerr << ", ";
     pr(p.S);   cerr << "}";
+}
+
+template<class... A>
+void pr(tuple<A...> t){
+    cerr << "(";
+    bool f = true;
+    apply([&](auto... x){
+        ((cerr << (f ? (f=false, "") : ", "), pr(x)), ...);
+    }, t);
+    cerr << ")";
 }
 
 template<class T>
@@ -96,7 +106,7 @@ rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
 const int mod = 998244353;
 // const int N = ; 
-const ll inf = 1e18; 
+const ll inf = 2e18; 
 
 
 void prep(){
@@ -104,26 +114,7 @@ void prep(){
 }
 
 void solve(int tcase){
-    int n, q; cin >> n >> q;
-    vll a(n+1); L(i, 1, n) cin >> a[i];
-
-    ll ans = n*(n+1)/2;
-    L(i, 1, n-1) {
-        if(a[i] != a[i+1]) ans += i * (n-i);
-    }
-
-    while(q--) {
-        int p, x; cin >> p >> x;
-        if(p-1 >= 1 and a[p-1] != a[p]) ans -= (p-1)*(n-p+1);
-        if(p+1 <= n and  a[p] != a[p+1]) ans -= p * (n-p);
-
-        a[p] = x;
-        if(p-1 >= 1 and a[p-1] != a[p]) ans += (p-1)*(n-p+1);
-        if(p+1 <= n and a[p] != a[p+1]) ans += p * (n-p);
-
-        cout << ans << nl;
-    }
-
+    deb("before insert");
 }
 
 int32_t main() {

@@ -43,8 +43,8 @@ using namespace __gnu_pbds;
 #define clz(x) __builtin_clzll(x)
 #define ctz(x) __builtin_ctzll(x)
 #define csb(x) __builtin_popcountll(x)
-#define msb(x) ((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
-#define lsb(x) ((x) ? (__builtin_ctzll((ll)(x))) : -1)
+#define msb(x) (ll)((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
+#define lsb(x) (ll)((x) ? (__builtin_ctzll((ll)(x))) : -1)
 
 #ifdef LOCAL
 template<class T> 
@@ -55,6 +55,16 @@ template<class A, class B>
 void pr(pair<A,B> p){
     cerr << "{";   pr(p.F);   cerr << ", ";
     pr(p.S);   cerr << "}";
+}
+
+template<class... A>
+void pr(tuple<A...> t){
+    cerr << "(";
+    bool f = true;
+    apply([&](auto... x){
+        ((cerr << (f ? (f=false, "") : ", "), pr(x)), ...);
+    }, t);
+    cerr << ")";
 }
 
 template<class T>
@@ -69,16 +79,23 @@ auto pr(T v) -> decltype(v.begin(), void()){
     cerr << "]";
 }
 
-void d_b(){ cerr << " ]\n"; }
+void d_b(const char* s) {} 
 
-template<class T,  class... U>
-void d_b(T& t,  U&... u){
-    pr(t);  if(sizeof...(u)) cerr << ", ";   
-    d_b(u...);
+template<class T, class... U>
+void d_b(const char* s, T t, U... u) {
+    while (*s == ',' || *s == ' ') s++;
+    const char* c = strchr(s, ',');
+    int len = c ? c - s : strlen(s);
+    
+    cerr.write(s, len) << " :"; 
+    pr(t); 
+    
+    if (sizeof...(u)) { cerr << "    ";  d_b(c, u...); }
+    else { cerr << endl ; }
 }
 
 #define deb(...) \
-cerr<<__LINE__<<": ["<<#__VA_ARGS__<<"] = [" , d_b(__VA_ARGS__)
+    cerr << __LINE__ << "| ", d_b(#__VA_ARGS__, __VA_ARGS__)
 
 #else
 #define deb(...)
@@ -87,9 +104,10 @@ cerr<<__LINE__<<": ["<<#__VA_ARGS__<<"] = [" , d_b(__VA_ARGS__)
 mt19937_64 \
 rnd(chrono::steady_clock::now().time_since_epoch().count());
 const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
-const int mod = 1e9 + 7;
+const int mod = 998244353;
 // const int N = ; 
-const ll inf = 1e18; 
+const ll inf = 2e18; 
+
 
 void prep(){
 
@@ -103,6 +121,6 @@ int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int t = 1;
-    // cin >> t;
+    cin >> t;
     L(i, 1, t) solve(i);
 }

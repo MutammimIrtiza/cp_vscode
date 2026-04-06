@@ -71,3 +71,5 @@ Lseg(int lo,int hi):lo(lo),hi(hi){}//Huge interval of neutrals
   }
 };
 
+
+

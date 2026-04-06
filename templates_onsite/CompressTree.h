@@ -5,8 +5,7 @@
  * Description: Given a rooted tree and a subset S of nodes, compute the minimal
  * subtree that contains all the nodes by adding all (at most $|S|-1$)
  * pairwise LCA's and compressing edges.
- * Returns a list of (par, orig\_index) representing a tree rooted at 0.
- * The root points to itself.
+ * Returns a list of (ParIndexOnThisList, orig\_index) representing a tree rooted at 0th element of the list. the Par of root is root.
  * Time: $O(|S| \log |S|)$
  * Status: Tested at CodeForces
  */

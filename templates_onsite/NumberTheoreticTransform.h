@@ -19,8 +19,7 @@
 #include "../number-theory/ModPow.h"
 
 const ll mod = (119 << 23) + 1, root = 62; // = 998244353
-// For p < 2^30 there is also e.g. 5 << 25, 7 << 26, 479 << 21
-// and 483 << 21 (same root). The last two are > 10^9.
+
 typedef vector<ll> vl;
 void ntt(vl &a) {
 	int n = sz(a), L = 31 - __builtin_clz(n);
@@ -45,11 +44,11 @@ vl conv(const vl &a, const vl &b) {
 	int s = sz(a) + sz(b) - 1, B = 32 - __builtin_clz(s),
 	    n = 1 << B;
 	int inv = modpow(n, mod - 2);
-	vl L(a), R(b), out(n);
-	L.resize(n), R.resize(n);
-	ntt(L), ntt(R);
+	vl l(a), r(b), out(n);
+	l.resize(n), r.resize(n);
+	ntt(l), ntt(r);
 	rep(i,0,n)
-		out[-i & (n - 1)] = (ll)L[i] * R[i] % mod * inv % mod;
+		out[-i & (n - 1)] = (ll)l[i] * r[i] % mod * inv % mod;
 	ntt(out);
 	return {out.begin(), out.begin() + s};
 }
