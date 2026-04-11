@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -32,22 +33,16 @@ ll ceil_div(ll a, ll b)
 
 void solve()
 {
-    string s; cin >> s; s = ' ' + s;
-
+    string s; cin >> s;
+    set<string> ss;
+    int ans = 0;
     int n = s.size();
-
-    int ans = 1;
-    L(i, 1, n) {
-        L(j, i, n) {
-            string t = s.substr(i, j-i+1);
-            int k = i;
-            int cur = 0;
-            while(s.substr(k, j-i+1) == t) {
-                k += j-i+1;
-                cur++;
-                if(k > n) break;
-            }
-            ans = max(ans, cur);
+    for(int i = 0; i < n; i++) {
+        for(int j  = i; j < n; j++) {
+            string cur = s.substr(i, j-i+1);
+            if(ss.count(cur)) continue;
+            ss.insert(cur);
+            ans += j-i+1;
         }
     }
     cout << ans << endl;

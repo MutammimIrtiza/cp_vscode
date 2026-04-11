@@ -108,13 +108,36 @@ const int mod = 998244353;
 // const int N = ; 
 const ll inf = 2e18; 
 
+vi Z(const string& s) {
+	vi z(sz(s));
+	int l = -1, r = -1;
+	rep(i,1,sz(s)) {
+		z[i] = i >= r ? 0 : min(r - i, z[i - l]);
+		while (i + z[i] < sz(s) && s[i + z[i]] == s[z[i]])
+			z[i]++;
+		if (i + z[i] > r)
+			l = i, r = i + z[i];
+	}
+	return z;
+}
+
 
 void prep(){
 
 }
 
 void solve(int tcase){
-    
+    string s, t; cin >> s >> t;
+    s = t + '#' + s + s;
+    vi z = Z(s);
+    int n = sz(t);
+    int ans = -1;
+    L(i, n+1, 2*n) {
+        if(z[i] == n) {
+            ans = i - n;
+        }
+    }
+    cout << ans << nl;
 }
 
 int32_t main() {

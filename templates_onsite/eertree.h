@@ -1,6 +1,15 @@
+sz - 2 // no. of distinct palindromes
+t[i].oc // no. of occurence of each [after running calc]
+sum(t[i].oc) // total no. of palindromic substrings
+
 struct PalindromicTree {
   struct node {
-    int nxt[26], len, st, en, link; ll cnt, oc;
+    int nxt[26]; // transitions (adding char to both ends)
+    int len;     // length of palindrome
+    int st, en;  // start and end index in original string
+    int link;    // suffix link (largest palindromic suffix)
+    ll cnt;      // no. of palindromic suffixes ending here
+    ll oc;       // no. of occurrences of this palindrome
   };
   string s;
   vector<node> t;

@@ -108,19 +108,40 @@ const int mod = 998244353;
 // const int N = ; 
 const ll inf = 2e18; 
 
+vi Z(const string& s) {
+	vi z(sz(s));
+	int l = -1, r = -1;
+	rep(i,1,sz(s)) {
+		z[i] = i >= r ? 0 : min(r - i, z[i - l]);
+		while (i + z[i] < sz(s) && s[i + z[i]] == s[z[i]])
+			z[i]++;
+		if (i + z[i] > r)
+			l = i, r = i + z[i];
+	}
+	return z;
+}
+
 
 void prep(){
 
 }
 
 void solve(int tcase){
-    deb("before insert");
+    string s; cin >> s;
+    vi z = Z(s);
+    int n = sz(s);
+    L(i, 1, n-1) {
+        if(i + z[i] - 1 == n-1) {
+            cout << s.substr(0, i) << nl; return;
+        }
+    }
+    cout << s << nl;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int t = 1;
-    // cin >> t;
+    cin >> t;
     L(i, 1, t) solve(i);
 }
