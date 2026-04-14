@@ -1,5 +1,18 @@
+/**
+ * Author: ...
+ * Description: ...
+ * Time: ...
+ * Status: ...
+ */
 sz - 2 // no. of distinct palindromes
-t[i].oc // no. of occurence of each [after running calc]
+no. of unique palindromes is linear !!! may use with hashing
+
+use cnt during construction. After extend(i):
+last = node representing the longest palindrome ending at pos i
+pt.t[pt.last].cnt; // no. of pals ending here, smaller included
+
+use oc after calc. 
+t[i].oc //no. of occurence of this exact pal[smaller excluded]
 sum(t[i].oc) // total no. of palindromic substrings
 
 struct PalindromicTree {
