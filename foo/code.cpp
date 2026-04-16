@@ -108,29 +108,47 @@ const int mod = 998244353;
 // const int N = ; 
 const ll inf = 2e18; 
 
-using pii = pll;
-struct RollbackUF {
-	vi e; vector<pii> st; int c; 
-	RollbackUF(int n) : e(n, -1), c(n) {}
-	int size(int x) { return -e[find(x)]; }
-	int find(int x) { return e[x] < 0 ? x : find(e[x]); }
-	int time() { return sz(st); }
-	void rollback(int t) {
-		c += (time() - t) / 2;
-		for (int i = time(); i --> t; )
-			e[st[i].first] = st[i].second;
-		st.resize(t);
-	}
-	bool join(int a, int b) {
-		a = find(a), b = find(b);
-		if (a == b) return false;
-		if (e[a] > e[b]) swap(a, b);
-		st.push_back({a, e[a]});
-		st.push_back({b, e[b]});
-		e[a] += e[b]; e[b] = a;
-		--c;
-		return true;
-	}
+struct Node {
+    vll freq = vll(41); // vll freq(41) is not allowed
+    int cnt=0;
+    static Node merge(Node &a, Node &b) {
+        Node ans;
+        L(i, 0, 40) {
+            ans.freq[i] = a.freq[i] + b.freq[i];
+            ans.cnt += (ans.freq[i] > 0);
+        } 
+        return ans;
+    }
+    Node () {}
+    Node (int x) {
+        freq[x] = 1;
+    }
+};
+
+using T = Node;
+struct Seg {
+    int n, m=1;
+    vector<T> t;
+    const T unit = Node();   // identity element
+
+    Seg(int _n): n(_n) {
+        while(m<n) m<<=1;
+        t.assign(2*m, unit);
+    }
+    T f(T a, T b) { return T::merge(a, b); } // operation
+
+    void upd(int p, T v) {
+        for(t[p+=m]=v;  p>1;  p>>=1)
+            t[p>>1] = f(t[p&~1], t[p|1]);// parent, lef, right
+    }
+    T qry(int l, int r) {   // [l, r)
+        T L=unit, R=unit;
+        for(l+=m, r+=m;  l<r;  l>>=1, r>>=1) {
+            if(l&1) L = f(L, t[l++]);
+            if(r&1) R = f(t[--r], R);
+        }
+        return f(L,R);
+    }
 };
 
 void prep(){
@@ -139,20 +157,18 @@ void prep(){
 
 void solve(int tcase){
     int n, q; cin >> n >> q;
-    RollbackUF dsu(n);
-    stack<int> checkpoints;
+    Seg seg(n);
+    L(i, 0, n-1) {
+        int x; cin >> x; seg.upd(i, Node(x));
+    }
     while(q--) {
-        string s; cin >> s;
-        if(s == "persist") {
-            checkpoints.push(dsu.time());
-        } else if(s == "union") {
-            int u, v; cin >> u >> v; u--, v--;
-            dsu.join(u, v);
-            cout << dsu.c << nl;
+        int typ; cin >> typ;
+        if(typ == 1) {
+            int l, r; cin >> l >> r; l--, r--;
+            cout << seg.qry(l, r+1).cnt << nl;
         } else {
-            dsu.rollback(checkpoints.top());
-            checkpoints.pop();
-            cout << dsu.c << nl;
+            int p, x; cin >> p >> x; p--;
+            seg.upd(p, Node(x));
         }
     }
 }
