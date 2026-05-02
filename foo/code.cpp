@@ -108,69 +108,34 @@ const int mod = 998244353;
 // const int N = ; 
 const ll inf = 2e18; 
 
-struct Node {
-    vll freq = vll(41); // vll freq(41) is not allowed
-    int cnt=0;
-    static Node merge(Node &a, Node &b) {
-        Node ans;
-        L(i, 0, 40) {
-            ans.freq[i] = a.freq[i] + b.freq[i];
-            ans.cnt += (ans.freq[i] > 0);
-        } 
-        return ans;
-    }
-    Node () {}
-    Node (int x) {
-        freq[x] = 1;
-    }
-};
-
-using T = Node;
-struct Seg {
-    int n, m=1;
-    vector<T> t;
-    const T unit = Node();   // identity element
-
-    Seg(int _n): n(_n) {
-        while(m<n) m<<=1;
-        t.assign(2*m, unit);
-    }
-    T f(T a, T b) { return T::merge(a, b); } // operation
-
-    void upd(int p, T v) {
-        for(t[p+=m]=v;  p>1;  p>>=1)
-            t[p>>1] = f(t[p&~1], t[p|1]);// parent, lef, right
-    }
-    T qry(int l, int r) {   // [l, r)
-        T L=unit, R=unit;
-        for(l+=m, r+=m;  l<r;  l>>=1, r>>=1) {
-            if(l&1) L = f(L, t[l++]);
-            if(r&1) R = f(t[--r], R);
-        }
-        return f(L,R);
-    }
-};
 
 void prep(){
 
 }
 
 void solve(int tcase){
-    int n, q; cin >> n >> q;
-    Seg seg(n);
-    L(i, 0, n-1) {
-        int x; cin >> x; seg.upd(i, Node(x));
-    }
-    while(q--) {
-        int typ; cin >> typ;
-        if(typ == 1) {
-            int l, r; cin >> l >> r; l--, r--;
-            cout << seg.qry(l, r+1).cnt << nl;
-        } else {
-            int p, x; cin >> p >> x; p--;
-            seg.upd(p, Node(x));
+    int n, k; cin >> n >> k;
+    vector<pll> a(n+2); L(i, 1, n) cin >> a[i].F >> a[i].S;
+    sort(range(a, 1, n), [](pll a, pll b) {
+        if(a.S != b.S) return a.S < b.S; // important !!!
+        return a.F < b.F; // just for strict ordering. no other reason.
+    });
+    multiset<ll> free_howar_time;
+    L(i, 1, k) free_howar_time.insert(0); // !!!!!!
+    ll ans = 0;
+    /*
+        wrong approach   : take the one freed earliest
+        correct approach : take the one freed closest
+    */
+    L(i, 1, n) {
+        if(free_howar_time.upper_bound(a[i].F) != free_howar_time.begin()) {
+            int take = *(--free_howar_time.upper_bound(a[i].F));
+            extract(free_howar_time, take);
+            free_howar_time.insert(a[i].S);
+            ans++;
         }
     }
+    cout << ans << nl;
 }
 
 int32_t main() {
