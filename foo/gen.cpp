@@ -88,9 +88,12 @@ int main(){
     // };
 
     // for(ll T: queries) cout << T << "\n";
+    cout << 1 << nl;
+    int n = rnd(1, 5);
+    string s1, s2;
+    for(int i = 0; i < n; i++) s1.push_back(rnd(0,1)+'a');
+    for(int i = 0; i < n; i++) s2.push_back(rnd(0,1)+'a');
+    cout << n << endl << s1 << endl << s2 << endl;
 
-    int n = rnd(1, 20);
-    string s; for(int i = 0; i < n; i++) s.push_back('a'+rnd(0,1));
-    cout << s << endl;
 
 }

@@ -1,147 +1,218 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
-// Extra functionality :
-// *st.find_by_order(index) = value at index
-// st.order_of_key(x) = no. of elements strictly less than x
+using ll = long long;
 
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
-#define ordered_set tree<int, null_type,less<int>, \
- rb_tree_tag,tree_order_statistics_node_update>
+static const int MOD = 1'000'000'007;
+static const int BASE = 5782344;
 
-#define int long long
-#define ll long long
-#define lld long double
-#define vi vector<int>
-#define pll pair<ll, ll>
-#define vll vector<ll>
-#define vvll vector<vll>
-#define vvvll vector<vvll>
-#define ar array
-#define F first
-#define S second
 
-#define all(v) v.begin(),v.end()
-#define range(v, i, j) v.begin()+i, v.begin()+j+1
-#define rep(i, a, b) for(long long i = (a); i < (b); ++(i))
-#define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
-#define R(i, a, b) for(long long i = (a); i >= (b); --(i))
-#define sz(x) (ll)(x.size())
-#define extract(m, x) \
- { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); }
-#define gp " "
-#define nl "\n"
-#define yes cout<<"YES"<<nl
-#define no cout<<"NO"<<nl
-
-#define isSet(x, i) ((x>>i)&1)
-#define setbit(x, i) (x | (1LL<<i))
-#define resetbit(x, i) (x & (~(1LL << i)))
-#define toggleBit(x, i) ((x) ^ (1LL << (i)))
-#define clz(x) __builtin_clzll(x)
-#define ctz(x) __builtin_ctzll(x)
-#define csb(x) __builtin_popcountll(x)
-#define msb(x) (ll)((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
-#define lsb(x) (ll)((x) ? (__builtin_ctzll((ll)(x))) : -1)
-
-#ifdef LOCAL
-template<class T> 
-auto pr(T x) -> decltype(cerr<<x, void()) {cerr<<x;}
-void pr(string s) {cerr << '"' << s << '"';}
-
-template<class A, class B>
-void pr(pair<A,B> p){
-    cerr << "{";   pr(p.F);   cerr << ", ";
-    pr(p.S);   cerr << "}";
+int addmod(int a, int b) {
+    a += b;
+    if (a >= MOD) a -= MOD;
+    return a;
 }
 
-template<class... A>
-void pr(tuple<A...> t){
-    cerr << "(";
-    bool f = true;
-    apply([&](auto... x){
-        ((cerr << (f ? (f=false, "") : ", "), pr(x)), ...);
-    }, t);
-    cerr << ")";
+int mulmod(ll a, ll b) {
+    return int((a * b) % MOD);
 }
 
-template<class T>
-auto pr(T v) -> decltype(v.begin(), void()){
-    cerr << "[";   
-    bool f = 1;
-    for(auto x : v){
-        if(!f) cerr << ", ";
-        f = false;
-        pr(x);
-    }
-    cerr << "]";
-}
+/*
+    recall:
+    # range qry of fixed value : prefix sum
+    # range qry of a qry value : vectors of pos for each value + binary search first, last
+    # range qry of a range of qry values : persistent seg tree
+*/
 
-void d_b(const char* s) {} 
+/*
+    for each persistent seg tree, we need to know:
+    -- what do versions represent?
+    -- what do leaves in a particular seg tree version represent?
+    -- what do leaves store?
+    -- what do inner nodes store? sum/max/min?
+*/
 
-template<class T, class... U>
-void d_b(const char* s, T t, U... u) {
-    while (*s == ',' || *s == ' ') s++;
-    const char* c = strchr(s, ',');
-    int len = c ? c - s : strlen(s);
-    
-    cerr.write(s, len) << " :"; 
-    pr(t); 
-    
-    if (sizeof...(u)) { cerr << "    ";  d_b(c, u...); }
-    else { cerr << endl ; }
-}
+static const ll INF = -(1LL << 60);
+struct PersistentSegTree {
+    struct Node {
+        int l = 0, r = 0; ll mx = -INF; // change as needed
+    };
 
-#define deb(...) \
-    cerr << __LINE__ << "| ", d_b(#__VA_ARGS__, __VA_ARGS__)
+    vector<Node> st;
 
-#else
-#define deb(...)
-#endif
+    PersistentSegTree() {st.push_back(Node());} // 0 = null
 
-mt19937_64 \
-rnd(chrono::steady_clock::now().time_since_epoch().count());
-const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
-const int mod = 998244353;
-// const int N = ; 
-const ll inf = 2e18; 
-
-
-void prep(){
-
-}
-
-void solve(int tcase){
-    int n, k; cin >> n >> k;
-    vector<pll> a(n+2); L(i, 1, n) cin >> a[i].F >> a[i].S;
-    sort(range(a, 1, n), [](pll a, pll b) {
-        if(a.S != b.S) return a.S < b.S; // important !!!
-        return a.F < b.F; // just for strict ordering. no other reason.
-    });
-    multiset<ll> free_howar_time;
-    L(i, 1, k) free_howar_time.insert(0); // !!!!!!
-    ll ans = 0;
-    /*
-        wrong approach   : take the one freed earliest
-        correct approach : take the one freed closest
-    */
-    L(i, 1, n) {
-        if(free_howar_time.upper_bound(a[i].F) != free_howar_time.begin()) {
-            int take = *(--free_howar_time.upper_bound(a[i].F));
-            extract(free_howar_time, take);
-            free_howar_time.insert(a[i].S);
-            ans++;
+    int update(int prev, int tl, int tr, int pos, ll val) {
+        st.push_back(st[prev]); // new copy of prev's root
+        int cur = (int)st.size() - 1;
+        if (tl == tr) {
+            st[cur].mx = val;
+            return cur;
         }
+        int tm = (tl + tr) >> 1; // either l/r of root changes
+        if (pos <= tm) st[cur].l = update(st[prev].l, tl, tm, pos, val);
+        else st[cur].r = update(st[prev].r, tm + 1, tr, pos, val);
+        st[cur].mx = max(st[st[cur].l].mx, st[st[cur].r].mx);
+        return cur;
     }
-    cout << ans << nl;
-}
 
-int32_t main() {
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
-    prep();
-    int t = 1;
-    // cin >> t;
-    L(i, 1, t) solve(i);
+    // query(root[i], 0, n-1, l, r) means
+    // maximum on range [l,r] in version i
+    ll query(int node, int tl, int tr, int l, int r) {
+        if (!node || r < tl || tr < l) return -INF;
+        if (l <= tl && tr <= r) return st[node].mx;
+
+        int tm = (tl + tr) >> 1;
+        return max( 
+            query(st[node].l, tl, tm, l, r),
+            query(st[node].r, tm + 1, tr, l, r)
+        );
+    }
+
+    // CUSTOM:
+
+    // Collect all ids in this version whose stored v >= need.
+    // We traverse left first, so ids are collected in increasing order.
+    // Problem statement bounds total leaves accessed, so its not costly
+    void collect(int node, int tl, int tr, ll v_need, vector<int>& out) const {
+        if (node == 0 || st[node].mx < v_need) return;
+        if (tl == tr) {
+            out.push_back(tl);
+            return;
+        }
+        int tm = (tl + tr) >> 1;
+        collect(st[node].l, tl, tm, v_need, out);
+        collect(st[node].r, tm + 1, tr, v_need, out);
+    }
+};
+
+struct Point {
+    ll u, v;
+    int id;
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    /*
+        ym = y of gun
+        xm = x of gun
+
+        |y-ym| <= (x-xm)/2
+        -(x-xm)/2 <= y-ym <= (x-xm)/2
+        -(x-xm) <= 2(y-ym) <= (x-xm)
+
+        split:
+        2y-2ym <= x-xm
+        2ym-2y <= x-xm
+
+        rearrange:
+        x-2y >= xm-2ym
+        x+2y >= xm+2ym
+
+        transformation:
+        x' = x-2y
+        y' = x+2y
+
+        Then condition becomes simply:
+        u >= um
+        v >= vm
+
+        i.e. a triangular query is transformed into a rectangular query. much easier.
+
+        now to answer queries:
+        create persistent seg tree with versions for each u (sorted)
+        for the given um, bin search to find first u >= um
+        go to the seg tree of that version
+        here, leaves = ids, and leaf value = v of that enemy
+        and, each node stores max value of v of its subtree
+        so we just dfs the tree, and stop when v_node < vm
+        else, continue till root and push back id into the answer vector
+        finally loop to calculate the sum
+
+        NOTE: TLE was coz leaves were not sorted by v. Fixed.
+    */
+
+    int N, q;
+    cin >> N >> q;
+
+    vector<Point> pts(N);
+    for (int i = 0; i < N; i++) {
+        ll x, y;
+        cin >> x >> y;
+        pts[i] = {x - 2LL * y, x + 2LL * y, i};
+    }
+
+
+    // Sort by v ascending and store [seg tree leaves are in this order, not Id order]
+    sort(pts.begin(), pts.end(), [](const Point& a, const Point& b) {
+        if (a.v != b.v) return a.v < b.v;
+        return a.u < b.u;
+    });
+    vector<int> pos(N), leaf_id(N);
+    for(int i = 0; i < N; ++i) {
+        pos[pts[i].id] = i;
+        leaf_id[i] = pts[i].id;
+    }
+
+
+    // Sort by u ascending [versions are in this order]
+    sort(pts.begin(), pts.end(), [](const Point& a, const Point& b) {
+        if (a.u != b.u) return a.u < b.u;
+        return a.v < b.v;
+    });
+
+    vector<ll> uvals(N);
+    for (int i = 0; i < N; i++) uvals[i] = pts[i].u;
+
+    // Persistent seg tree over ids [0..N-1]
+    PersistentSegTree pst;
+    vector<int> root(N + 1, 0);
+
+    // root[i] = version containing points i..N-1 (all with u >= uvals[i])
+    // root[N] = empty
+    for (int i = N - 1; i >= 0; i--) {
+        root[i] = pst.update(root[i + 1], 0, N - 1, pos[pts[i].id], pts[i].v);
+    }
+
+
+    // powers of BASE
+    vector<int> pw(N + 1);
+    pw[0] = 1;
+    for (int i = 1; i <= N; i++) pw[i] = mulmod(pw[i - 1], BASE);
+
+    int last = 0;
+
+
+    while (q--) {
+        int a, b;
+        cin >> a >> b;
+
+        ll xm = -1LL - ((last + a) % MOD);
+        ll ym = (last + b) % MOD;
+
+        ll U = xm - 2LL * ym;
+        ll V = xm + 2LL * ym;
+
+        // Find first point with u >= U
+        int idx = lower_bound(uvals.begin(), uvals.end(), U) - uvals.begin();
+
+        vector<int> leaves;
+        if (idx < N) pst.collect(root[idx], 0, N - 1, V, leaves);
+
+        vector<int> ids; 
+        for(int leaf : leaves) ids.push_back(leaf_id[leaf]);
+        sort(ids.begin(), ids.end());
+
+        int ans = 0;
+        for (int j = 0; j < (int)ids.size(); j++) {
+            ans = addmod(ans, mulmod(ids[j] + 1, pw[j]));
+        }
+
+        cout << ans << '\n';
+        last = ans;
+    }
+
+    return 0;
 }

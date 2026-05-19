@@ -130,5 +130,5 @@
         }
     },
     "vim.startInInsertMode": true,
-    "vim.enabled": false
+    "vim.enabled": false,
 }

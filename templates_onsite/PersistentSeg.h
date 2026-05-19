@@ -1,89 +1,68 @@
-struct Node {
-    Node *left = nullptr, *right = nullptr;  ll sum = 0;
-};
-// Builds a segment tree on [l, r)
-// Returns a pointer to the constructed tree.
-Node *build(int l, int r) {
-    Node *p = new Node();
-    if (r - l == 1) return p;
-    int m = (l + r) / 2;
-    p->left = build(l, m);
-    p->right = build(m, r);
-    return p;
-}
-// Changes value in position k to x in tree p.
-// Returns a pointer to the new tree.
-Node *change(Node *p, int l, int r, int k, int x) {
-    Node *n = new Node(*p);
-    if (r - l == 1) { n->sum = x; }
-    else {
-        int m = (l + r) / 2;
-        if (k < m) { n->left = change(p->left, l, m, k, x); }
-        else { n->right = change(p->right, m, r, k, x); }
-        n->sum = n->left->sum + n->right->sum;
-    } return n;
-}
-// Returns the sum of values in range [ql, qr).
-ll query(Node *p, int l, int r, int ql, int qr) {
-    if (qr <= l || r <= ql) return 0;
-    if (ql <= l && r <= qr) return p->sum;
-    int m = (l + r) / 2;
-    return query(p->left, l, m, ql, qr) + 
-            query(p->right, m, r, ql, qr);
-}
+/*
+    recall:
+    # range qry of fixed value : prefix sum
+    # range qry of a qry value : vectors of pos for each value + binary search first, last
+    # range qry of a range of qry values : persistent seg tree
+*/
 
+/*
+    for each persistent seg tree, we need to know:
+    -- what do versions represent?
+    -- what do leaves in a particular seg tree version represent?
+    -- what do leaves store?
+    -- what do inner nodes store? sum/max/min?
+*/
 
+static const ll INF = -(1LL << 60);
+struct PersistentSegTree {
+    struct Node {
+        int l = 0, r = 0; ll mx = -INF; // change as needed
+    };
 
-#include<bits/stdc++.h>
-using namespace std;
-#define ll long long
+    vector<Node> st;
 
-struct Node {
-    Node *left = nullptr, *right = nullptr; ll sum = 0;
-};
-struct PerSegTree {
-    std::set<Node*> allocated_nodes;
-    std::vector<Node*> roots;
-    int n;
-    PerSegTree(int n) : n(n) { roots.push_back(build(0, n)); }
-    ~PerSegTree() {
-        for (auto ptr : allocated_nodes) delete ptr;
-    }
-private:
-    Node* build(int l, int r) {
-        Node* p = new Node();  allocated_nodes.insert(p);
-        if (r - l == 1) return p;
-        int m = (l + r) / 2;
-        p->left = build(l, m);  p->right = build(m, r);
-        return p;
-    }
-    Node* change(Node* p, int l, int r, int k, int x) {
-        Node* n = new Node(*p);  allocated_nodes.insert(n);
-        if (r - l == 1) { n->sum = x; }
-        else {
-            int m = (l + r) / 2;
-            if (k < m) n->left = change(p->left, l, m, k, x);
-            else n->right = change(p->right, m, r, k, x);
-            n->sum = n->left->sum + n->right->sum;
+    PersistentSegTree() {st.push_back(Node());} // 0 = null
+
+    int update(int prev, int tl, int tr, int pos, ll val) {
+        st.push_back(st[prev]); // new copy of prev's root
+        int cur = (int)st.size() - 1;
+        if (tl == tr) {
+            st[cur].mx = val;
+            return cur;
         }
-        return n;
+        int tm = (tl + tr) >> 1; // either l/r of root changes
+        if (pos <= tm) st[cur].l = update(st[prev].l, tl, tm, pos, val);
+        else st[cur].r = update(st[prev].r, tm + 1, tr, pos, val);
+        st[cur].mx = max(st[st[cur].l].mx, st[st[cur].r].mx);
+        return cur;
     }
-    ll query(Node* p, int l, int r, int ql, int qr) {
-        if (qr <= l || r <= ql) return 0;
-        if (ql <= l && r <= qr) return p->sum;
-        int m = (l + r) / 2;
-        return query(p->left, l, m, ql, qr) +
-               query(p->right, m, r, ql, qr);
+
+    // query(root[i], 0, n-1, l, r) means
+    // maximum on range [l,r] in version i
+    ll query(int node, int tl, int tr, int l, int r) {
+        if (!node || r < tl || tr < l) return -INF;
+        if (l <= tl && tr <= r) return st[node].mx;
+
+        int tm = (tl + tr) >> 1;
+        return max( 
+            query(st[node].l, tl, tm, l, r),
+            query(st[node].r, tm + 1, tr, l, r)
+        );
     }
-public:
-    // Creates a new version by changing position k to x.
-    // Returns the new version index.
-    int update(int version, int k, int x) {
-        Node* new_root = change(roots[version], 0, n, k, x);
-        roots.push_back(new_root);
-        return roots.size() - 1;
-    }
-    ll query(int version, int ql, int qr) {
-        return query(roots[version], 0, n, ql, qr);
+
+    // CUSTOM:
+
+    // Collect all ids in this version whose stored v >= need.
+    // We traverse left first, so ids are collected in increasing order.
+    // Problem statement bounds total leaves accessed, so its not costly
+    void collect(int node, int tl, int tr, ll v_need, vector<int>& out) const {
+        if (node == 0 || st[node].mx < v_need) return;
+        if (tl == tr) {
+            out.push_back(tl);
+            return;
+        }
+        int tm = (tl + tr) >> 1;
+        collect(st[node].l, tl, tm, v_need, out);
+        collect(st[node].r, tm + 1, tr, v_need, out);
     }
 };

@@ -33,16 +33,11 @@ ll ceil_div(ll a, ll b)
 
 void solve()
 {
-    string s; cin >> s;
-    set<string> ss;
-    int ans = 0;
-    int n = s.size();
+    int n; string s1, s2; cin >> n >> n >> s1 >> s2;
+        int ans = 0;
     for(int i = 0; i < n; i++) {
-        for(int j  = i; j < n; j++) {
-            string cur = s.substr(i, j-i+1);
-            if(ss.count(cur)) continue;
-            ss.insert(cur);
-            ans += j-i+1;
+        for(int j = 0; j < n; j++) {
+            if((s1.substr(0, i+1) + s2.substr(j, n-j)) == (s1.substr(j, n-j) + s2.substr(0,i+1))) ans++;
         }
     }
     cout << ans << endl;
