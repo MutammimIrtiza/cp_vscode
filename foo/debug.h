@@ -2,12 +2,11 @@
 
 template<class T> 
 auto pr(T x) -> decltype(cerr<<x, void()) {cerr<<x;}
-void pr(string s) {cerr << '"' << s << '"';}
+void pr(string s) {cerr<<s;}
 
 template<class A, class B>
 void pr(pair<A,B> p){
-    cerr << "{";   pr(p.F);   cerr << ", ";
-    pr(p.S);   cerr << "}";
+  cerr << "{";  pr(p.F);  cerr << ", ";  pr(p.S);  cerr << "}";
 }
 
 template<class... A>
@@ -32,18 +31,11 @@ auto pr(T v) -> decltype(v.begin(), void()){
     cerr << "]";
 }
 
-void d_b(const char* s) {} 
-
-template<class T, class... U>
-void d_b(const char* s, T t, U... u) {
-    while (*s == ',' || *s == ' ') s++;
-    const char* c = strchr(s, ',');
-    int len = c ? c - s : strlen(s);
-    cerr.write(s, len) << " :"; 
-    pr(t); 
-    if (sizeof...(u)) { cerr << "    ";  d_b(c, u...); }
-    else { cerr << endl ; }
+template<class... T>
+void d_b(const T&... x){
+    ((pr(x), cerr << ", "), ...);
+    cerr << '\n';
 }
 
-#define deb(...) \
-    cerr << __LINE__ << "| ", d_b(#__VA_ARGS__, __VA_ARGS__)
+#define deb(...) cerr << __LINE__ << "| " << #__VA_ARGS__ << \
+ " : ", d_b(__VA_ARGS__)

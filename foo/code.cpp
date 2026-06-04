@@ -1,112 +1,77 @@
-// بِسْمِ ٱللّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ //
-
 #include<bits/stdc++.h>
 using namespace std;
 
-// #include <ext/pb_ds/assoc_container.hpp>
-// #include <ext/pb_ds/tree_policy.hpp>
-// #define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
-// using namespace __gnu_pbds;
 // Extra functionality :
 // *st.find_by_order(index) = value at index
-// st.order_of_key(value) = number of elements strictly less than value
+// st.order_of_key(x) = no. of elements strictly less than x
 
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+#define ordered_set tree<int, null_type,less<int>, \
+ rb_tree_tag,tree_order_statistics_node_update>
+
+#define int long long
 #define ll long long
 #define lld long double
-#define vll vector<long long>
-#define pll pair<long long, long long>
+#define vi vector<int>
+#define pll pair<ll, ll>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define vvvll vector<vvll>
+#define ar array
 #define F first
 #define S second
+
 #define all(v) v.begin(),v.end()
 #define range(v, i, j) v.begin()+i, v.begin()+j+1
-#define For(i, a, b) for(long long i = (a); i <= (b); ++(i))
+#define rep(i, a, b) for(long long i = (a); i < (b); ++(i))
 #define L(i, a, b) for(long long i = (a); i <= (b); ++(i))
 #define R(i, a, b) for(long long i = (a); i >= (b); --(i))
 #define sz(x) (ll)(x.size())
+#define extract(m, x) \
+ { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); }
 #define gp " "
+#define nl "\n"
+#define yes cout<<"YES"<<nl
+#define no cout<<"NO"<<nl
+
+#define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
 #define resetbit(x, i) (x & (~(1LL << i)))
+#define toggleBit(x, i) ((x) ^ (1LL << (i)))
+#define clz(x) __builtin_clzll(x)
+#define ctz(x) __builtin_ctzll(x)
+#define csb(x) __builtin_popcountll(x)
+#define msb(x) (ll)((x) ? (63 - __builtin_clzll((ll)(x))) : -1)
+#define lsb(x) (ll)((x) ? (__builtin_ctzll((ll)(x))) : -1)
 
-#define DEBUG
-
-#ifdef DEBUG
-#define debug(n) cout<<__LINE__<<" "<<#n<<" "<<n<<endl;
-#define debugc(a) cout<<__LINE__<<" "<<#a<<" "<<'['<<" ";for(auto el:a){cout<<el<<" ";}cout<<']'<<endl;
-#define debugcc(a) cout<<__LINE__<<" "<<#a<<" "<<'['<<" ";for(auto el:a){cout<<'{'<<" "<<el.F<<','<<el.S<<" "<<'}'<<" ";}cout<<']'<<endl;
+#ifdef LOCAL
+#include "debug.h"
 #else
-#define debug(n)
-#define debugc(a)
-#define debugcc(a)
+#define deb(...)
 #endif
 
-const int mod = 1e9 + 7;
-const int N = 200005; ///////////////////////////////////////
-const ll inf = 1e15; /////////////////////////////////////////////
+mt19937_64 \
+rnd(chrono::steady_clock::now().time_since_epoch().count());
+const int dx4[4] = {0, 0, 1, -1}, dy4[4] = {1, -1, 0, 0};
+const int mod = 998244353;
+// const int N = ; 
+const ll inf = 2e18; 
+
 
 void prep(){
+
+}
+
+void solve(int tcase){
     
 }
 
-ll n, m, x, q, kk, u, v, w;
-vll ar(N);
-vll gr[N];
-
-// 
-void solve(){
-    cin >> n >> m >> kk;
-    L(i, 1, kk){
-        cin >> ar[i];
-    }
-    L(i, 1, m){
-        cin >> u >> v;
-        gr[u].push_back(v);
-        gr[v].push_back(u);
-    }
-
-    ll mnod = inf;
-    L(i, 1, kk) if(ar[i] & 1) mnod = min(mnod, ar[i]);
-
-    ll sum = accumulate(range(ar, 1, kk), 0LL);
-    ll evtar, odtar;
-    if(sum & 1){
-        odtar = sum;
-        evtar = sum - mnod;
-    }
-    else{
-        evtar = sum;
-        odtar = sum - mnod;
-    }
-
-    vector<vll> dis(n+1, vll(2, inf));
-    queue<array<ll, 2>> q; // {node, parity of entrance}
-    q.push({1, 0});
-    dis[1][0] = 0;
-    while(sz(q)){
-        auto [node, p] = q.front();
-        q.pop();
-        for(auto nexnode : gr[node]){
-            if(dis[nexnode][!p] == inf){
-                dis[nexnode][!p] = dis[node][p] + 1;
-                q.push({nexnode, !p});
-            }
-        }
-    }
-    L(i, 1, n){
-        if(evtar >= dis[i][0] or odtar >= dis[i][1]) cout << 1;
-        else cout << 0;
-    }
-    cout << endl;
-
-
-// dont forget to cleanup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    L(i, 1, n){
-        gr[i].clear();
-    }
-}
-
-int main() {
+int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int t; cin >> t; while(t--)
-    solve();
+    int t = 1;
+    // cin >> t;
+    L(i, 1, t) solve(i);
 }
