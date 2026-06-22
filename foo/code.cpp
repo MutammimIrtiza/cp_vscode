@@ -64,14 +64,70 @@ void prep(){
 
 }
 
+
+struct mint{
+ ll x; mint() { x=0; }
+ mint(ll xx) {x = xx%mod; if(x<0)x+=mod; }
+
+ mint& operator+=(mint b){ x=(x + b.x)%mod; return *this; }
+ mint& operator*=(mint b){ x=(x * b.x)%mod; return *this; }
+ mint& operator-=(mint b){ x=(x - b.x +mod)%mod; return *this;}
+
+ friend mint operator+(mint a,mint b){ return a+=b; }
+ friend mint operator-(mint a,mint b){ return a-=b; }
+ friend mint operator*(mint a,mint b){ return a*=b; }
+};
+
 void solve(int tcase){
+/*
+    unlike most string dp problems, 
+    the only strings of our concern are those centered at the center.
+    This reduces time complexity.
+*/
+    string s; cin >> s;
+    int n = sz(s); 
+    s = " " + s;
     
+    bool ispal[n+1][n+1]; memset(ispal,0,sizeof ispal);
+    L(i,1,n) ispal[i][i] = 1;
+    R(i,n-1,1) {
+        L(j,i+1,n){
+            ispal[i][j] = (s[i]==s[j]) && (j==i+1 || ispal[i+1][j-1]);
+        }   
+    }
+
+    mint dp_sum_of_x_sq[n+1]; 
+    mint dp_sum_of_x[n+1]; 
+    mint dp_cnt[n+1]; 
+
+    int m = n/2;
+    if(n&1) dp_sum_of_x_sq[m+1] = 1, dp_sum_of_x[m+1] = 1, dp_cnt[m+1] = 1;
+    
+    R(l,m,1) {
+        ll r = n-l+1;
+        if(ispal[l][r]) {
+            dp_sum_of_x_sq[l] = 1, dp_sum_of_x[l] = 1, dp_cnt[l] = 1; 
+        }
+        if(n%2==0 and ispal[l][m] and ispal[m+1][r]) {
+            dp_sum_of_x_sq[l] += 4, dp_sum_of_x[l] += 2, dp_cnt[l] += 1;
+        }
+        L(len,1,n/2-l+1) {
+            if(!ispal[l][l+len-1]) continue;
+            if(!ispal[r-len+1][r]) continue;
+            if(n%2==0 and len==n/2-l+1) continue;
+            dp_sum_of_x_sq[l] += dp_sum_of_x_sq[l+len] + 4*dp_sum_of_x[l+len] + 4*dp_cnt[l+len];
+            dp_sum_of_x[l] += dp_sum_of_x[l+len] + 2 * dp_cnt[l+len];
+            dp_cnt[l] += dp_cnt[l+len];
+        }
+    }
+    cout << dp_sum_of_x_sq[1].x << '\n';
+
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
     int t = 1;
-    // cin >> t;
+    cin >> t;
     L(i, 1, t) solve(i);
 }

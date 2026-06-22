@@ -1,41 +1,31 @@
 #pragma once
-
-template<class T> 
-auto pr(T x) -> decltype(cerr<<x, void()) {cerr<<x;}
+template<class t> 
+auto pr(t x) -> decltype(cerr<<x, void()) {cerr<<x;}
 void pr(string s) {cerr<<s;}
-
-template<class A, class B>
-void pr(pair<A,B> p){
+template<class a, class b>
+void pr(pair<a,b> p){
   cerr << "{";  pr(p.F);  cerr << ", ";  pr(p.S);  cerr << "}";
 }
-
-template<class... A>
-void pr(tuple<A...> t){
+template<class... a>
+void pr(tuple<a...> t){
     cerr << "(";
-    bool f = true;
     apply([&](auto... x){
-        ((cerr << (f ? (f=false, "") : ", "), pr(x)), ...);
+        ((pr(x), cerr << ", "), ...);
     }, t);
     cerr << ")";
 }
-
-template<class T>
-auto pr(T v) -> decltype(v.begin(), void()){
+template<class t>
+auto pr(t v) -> decltype(v.begin(), void()){
     cerr << "[";   
-    bool f = 1;
     for(auto x : v){
-        if(!f) cerr << ", ";
-        f = false;
-        pr(x);
+        pr(x); cerr << ", ";
     }
     cerr << "]";
 }
-
-template<class... T>
-void d_b(const T&... x){
+template<class... t>
+void _deb(const t&... x){
     ((pr(x), cerr << ", "), ...);
     cerr << '\n';
 }
-
-#define deb(...) cerr << __LINE__ << "| " << #__VA_ARGS__ << \
- " : ", d_b(__VA_ARGS__)
+#define deb(...) cerr << __LINE__ << "| [" << #__VA_ARGS__ << \
+ "] = " ,  _deb(__VA_ARGS__)

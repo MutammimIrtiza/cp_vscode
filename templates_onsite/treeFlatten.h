@@ -1,12 +1,11 @@
 /**
- * Author: idk
- * Description: idk
- * Time: idk
- * Status: idk
+ * Author: ...
+ * Description: Subtree of a node is [ in[node]...out[node] ]
+ * The node itself is [ in[node]...in[node] ]
+ * Time: ...
+ * Status: ...
  */
-
-ll timer = -1;
-vll in(N), out(N);
+vll in(N), out(N);   ll timer = -1;
 void euler_tour(ll node, ll par) {
     in[node] = ++timer;
     for(ll ch : gr[node]) {

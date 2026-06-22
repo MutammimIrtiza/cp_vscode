@@ -4,18 +4,16 @@ using namespace std;
 #define ll long long
 #define vll vector<ll>
 ll inf = 1e18;
-
-using T = ll;
-struct Node {
-    T mn=inf, mx=-inf, sm=0; // remove/add variables as needed
-};
 struct Lseg {
-    Lseg *lc=0, *rc=0; Node v; int l, r;
+    struct node {
+        T mn=0, mx=0, sm=0; // remove/add variables as needed
+    };
+    Lseg *lc=0, *rc=0; node v; int l, r;
 
     // s:set tag (inf=none), a:add tag, v:stored node values
     T s=inf, a=0; //custom
-
-    Node f(Node i, Node j) { // merge function  // custom
+    
+    node f(node i, node j) { // merge function  // custom
         return {min(i.mn, j.mn), max(i.mx, j.mx), i.sm + j.sm};
     }
 
@@ -51,8 +49,8 @@ struct Lseg {
 		    v=f(lc->v, rc->v);
     }
 
-    Node qry(int x, int y) {
-        if(y<=l || r<=x) return Node();
+    node qry(int x, int y) {
+        if(y<=l || r<=x) return {inf,-inf,0};
         if(x<=l && r<=y) return v;
         ph(); return f(lc->qry(x, y), rc->qry(x, y));
     }
