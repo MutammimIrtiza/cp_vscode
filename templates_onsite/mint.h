@@ -1,8 +1,4 @@
-#include<bits/stdc++.h>
-using namespace std;
-#define ll long long
 
-const int mod=1000000007; 
 struct mint{
  ll x; mint() { x=0; }
  mint(ll xx) {x = xx%mod; if(x<0)x+=mod; }

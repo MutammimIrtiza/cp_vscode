@@ -1,7 +1,9 @@
 #pragma once
 template<class t> 
+auto pr(t v) -> decltype(v.begin(), void());
+template<class t> 
 auto pr(t x) -> decltype(cerr<<x, void()) {cerr<<x;}
-void pr(string s) {cerr<<s;}
+auto pr(string s) {cerr<<s;}
 template<class a, class b>
 void pr(pair<a,b> p){
   cerr << "{";  pr(p.F);  cerr << ", ";  pr(p.S);  cerr << "}";

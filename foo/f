@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=code.cpp
-EXE=a.out
+EXE=a
 
 g++ -std=c++17 -O2 -Wno-unused-result $SRC -o $EXE
 

@@ -4,9 +4,8 @@ for inp in in in[0-9]*; do
         echo
         echo "Input: $inp"
         cat $inp
-        echo
         echo Output:
-        ./a.out < $inp
+        ./a < $inp
         echo
     fi
 done
