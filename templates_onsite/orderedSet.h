@@ -1,7 +1,9 @@
-#include <bits/extc++.h> /** keep-include */
+// Extra functionality :
+// *st.find_by_order(index) = value at index
+// st.order_of_key(x) = no. of elements strictly less than x
+
 #include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp> 
-#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+#include <ext/pb_ds/tree_policy.hpp>
 using namespace __gnu_pbds;
-// *st.find_by_order(i) : ith largest element
-// st.order_of_key(k) : number of items strictly smaller than k 
+#define ordered_set tree<int, null_type,less<int>, \
+ rb_tree_tag,tree_order_statistics_node_update>
