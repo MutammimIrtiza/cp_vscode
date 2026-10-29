@@ -1,24 +1,12 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// Extra functionality :
-// *st.find_by_order(index) = value at index
-// st.order_of_key(x) = no. of elements strictly less than x
-
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
-#define ordered_set tree<int, null_type,less<int>, \
- rb_tree_tag,tree_order_statistics_node_update>
-
 #define int long long
 #define ll long long
-#define lld long double
+#define ld long double
 #define vi vector<int>
-#define pll pair<ll, ll>
-#define vll vector<ll>
-#define vvll vector<vll>
-#define vvvll vector<vvll>
+#define pii pair<int, int>
+#define vec vector
 #define ar array
 #define F first
 #define S second
@@ -31,10 +19,8 @@ using namespace __gnu_pbds;
 #define sz(x) (ll)(x.size())
 #define extract(m, x) \
  { auto it = (m).find(x); if (it != (m).end()) (m).erase(it); }
-#define gp " "
-#define nl "\n"
-#define yes cout<<"YES"<<nl
-#define no cout<<"NO"<<nl
+#define yes cout<<"YES\n"
+#define no cout<<"NO\n"
 
 #define isSet(x, i) ((x>>i)&1)
 #define setbit(x, i) (x | (1LL<<i))
@@ -47,56 +33,7 @@ using namespace __gnu_pbds;
 #define lsb(x) (ll)((x) ? (__builtin_ctzll((ll)(x))) : -1)
 
 #ifdef LOCAL
-template<class T> 
-auto pr(T x) -> decltype(cerr<<x, void()) {cerr<<x;}
-void pr(string s) {cerr << '"' << s << '"';}
-
-template<class A, class B>
-void pr(pair<A,B> p){
-    cerr << "{";   pr(p.F);   cerr << ", ";
-    pr(p.S);   cerr << "}";
-}
-
-template<class... A>
-void pr(tuple<A...> t){
-    cerr << "(";
-    bool f = true;
-    apply([&](auto... x){
-        ((cerr << (f ? (f=false, "") : ", "), pr(x)), ...);
-    }, t);
-    cerr << ")";
-}
-
-template<class T>
-auto pr(T v) -> decltype(v.begin(), void()){
-    cerr << "[";   
-    bool f = 1;
-    for(auto x : v){
-        if(!f) cerr << ", ";
-        f = false;
-        pr(x);
-    }
-    cerr << "]";
-}
-
-void d_b(const char* s) {} 
-
-template<class T, class... U>
-void d_b(const char* s, T t, U... u) {
-    while (*s == ',' || *s == ' ') s++;
-    const char* c = strchr(s, ',');
-    int len = c ? c - s : strlen(s);
-    
-    cerr.write(s, len) << " :"; 
-    pr(t); 
-    
-    if (sizeof...(u)) { cerr << "    ";  d_b(c, u...); }
-    else { cerr << endl ; }
-}
-
-#define deb(...) \
-    cerr << __LINE__ << "| ", d_b(#__VA_ARGS__, __VA_ARGS__)
-
+#include "debug.h"
 #else
 #define deb(...)
 #endif
@@ -108,36 +45,12 @@ const int mod = 998244353;
 // const int N = ; 
 const ll inf = 2e18; 
 
-vi Z(const string& s) {
-	vi z(sz(s));
-	int l = -1, r = -1;
-	rep(i,1,sz(s)) {
-		z[i] = i >= r ? 0 : min(r - i, z[i - l]);
-		while (i + z[i] < sz(s) && s[i + z[i]] == s[z[i]])
-			z[i]++;
-		if (i + z[i] > r)
-			l = i, r = i + z[i];
-	}
-	return z;
-}
-
-
 void prep(){
 
 }
 
 void solve(int tcase){
-    string s, t; cin >> s >> t;
-    s = t + '#' + s + s;
-    vi z = Z(s);
-    int n = sz(t);
-    int ans = -1;
-    L(i, n+1, 2*n) {
-        if(z[i] == n) {
-            ans = i - n;
-        }
-    }
-    cout << ans << nl;
+    
 }
 
 int32_t main() {

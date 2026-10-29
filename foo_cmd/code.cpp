@@ -60,22 +60,21 @@ void prep(){
     
 }
 
-ll n, m, x, y, z, q, k, u, v, w;
 
 void solve(int tcase){
     
-    // testcases ?
-
-    // cleanup ?
-
-    
+    int n; cin >> n;
+    cout <<n << endl;
+    map<string, array<int,2>> m;
+    m["dlfj"] = {23,543};
+    deb(m,n);
 
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     prep();
-    int tcase = 1;
-    int t; cin >> t; for(; tcase <= t; ++tcase)
-    solve(tcase);
+    int t = 1;
+    cin >> t;
+    L(i, 1, t) solve(i);
 }
